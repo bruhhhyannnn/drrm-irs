@@ -12,6 +12,7 @@ import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
 import { Input } from '@/components/ui/input';
 import { Label, Select, Textarea } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
+import { Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 const CATEGORY_OPTIONS = [
@@ -44,8 +45,7 @@ export function NewsForm({ editId }: NewsFormProps) {
     register,
     handleSubmit,
     reset,
-    setValue,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
@@ -133,12 +133,18 @@ export function NewsForm({ editId }: NewsFormProps) {
             </div>
             <div>
               <Label required>Category</Label>
-              <Select
-                options={CATEGORY_OPTIONS}
-                value={watch('category')}
-                onChange={(v) => setValue('category', v)}
-                error={!!errors.category}
-                hint={errors.category?.message}
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    options={CATEGORY_OPTIONS}
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={!!errors.category}
+                    hint={errors.category?.message}
+                  />
+                )}
               />
             </div>
             <div>

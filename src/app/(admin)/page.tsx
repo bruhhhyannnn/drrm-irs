@@ -196,7 +196,7 @@ export default function DashboardPage() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-[240px] items-center justify-center">
+            <div className="flex h-60 items-center justify-center">
               <p className="text-sm text-gray-400">No data yet</p>
             </div>
           )}

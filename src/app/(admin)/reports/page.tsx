@@ -16,6 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
+import type { Report } from '@/types/database';
 
 const PER_PAGE = 10;
 
@@ -24,7 +25,7 @@ export default function ReportsPage() {
   const [page, setPage] = useState(1);
   const { data, isLoading, error } = useReports(page, query);
 
-  const totalAffected = (r: (typeof data)['data'][0]) =>
+  const totalAffected = (r: Report) =>
     (r.students ?? 0) +
     (r.facultymembers ?? 0) +
     (r.adminmembers ?? 0) +
