@@ -8,6 +8,9 @@ const outfit = Outfit({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'UPM DRRM - IRS',
   description: 'UP Manila Disaster Risk Reduction Management - Incident Reporting System',
+  icons: {
+    icon: '/logo.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
