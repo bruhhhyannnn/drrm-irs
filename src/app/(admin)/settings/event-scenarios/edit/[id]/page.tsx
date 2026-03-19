@@ -1,4 +1,4 @@
-import { SettingsForm } from '@/components/settings/settings-form';
+import { SettingsForm } from '@/components/settings';
 export default function EditPage({ params }: { params: { id: string } }) {
   return (
     <SettingsForm

@@ -1,9 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib';
 import type { Event } from '@/types/database';
 
 async function fetchEvents(query?: string): Promise<Event[]> {
-  let builder = supabase.from('events').select('*').order('created_at', { ascending: false }).limit(100);
+  let builder = supabase
+    .from('events')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100);
 
   if (query) {
     builder = builder.ilike('eventname', `%${query}%`);

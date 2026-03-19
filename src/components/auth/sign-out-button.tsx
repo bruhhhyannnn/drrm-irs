@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { useAuthStore } from '@/store/auth.store';
+import { supabase } from '@/lib';
+import { useAuthStore } from '@/store';
 import { LogOut } from 'lucide-react';
 
 export function SignOutButton() {

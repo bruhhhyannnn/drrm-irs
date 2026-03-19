@@ -12,14 +12,30 @@ interface SidebarState {
   closeMobile: () => void;
 }
 
-export const useSidebarStore = create<SidebarState>((set) => ({
+export const useSidebarStore = create<SidebarState>((set, get) => ({
   isExpanded: true,
   isMobileOpen: false,
   isHovered: false,
   openSubmenu: null,
-  toggleSidebar: () => set((s) => ({ isExpanded: !s.isExpanded })),
-  toggleMobileSidebar: () => set((s) => ({ isMobileOpen: !s.isMobileOpen })),
-  setIsHovered: (val) => set({ isHovered: val }),
-  toggleSubmenu: (key) => set((s) => ({ openSubmenu: s.openSubmenu === key ? null : key })),
-  closeMobile: () => set({ isMobileOpen: false }),
+
+  toggleSidebar() {
+    set({ isExpanded: !get().isExpanded });
+  },
+
+  toggleMobileSidebar() {
+    set({ isMobileOpen: !get().isMobileOpen });
+  },
+
+  setIsHovered(val: boolean) {
+    set({ isHovered: val });
+  },
+
+  toggleSubmenu(key: string) {
+    const current = get().openSubmenu;
+    set({ openSubmenu: current === key ? null : key });
+  },
+
+  closeMobile() {
+    set({ isMobileOpen: false });
+  },
 }));

@@ -10,9 +10,13 @@ interface ThemeState {
 
 export const useThemeStore = create<ThemeState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       theme: 'light',
-      toggleTheme: () => set((s) => ({ theme: s.theme === 'light' ? 'dark' : 'light' })),
+
+      toggleTheme() {
+        const next = get().theme === 'light' ? 'dark' : 'light';
+        set({ theme: next });
+      },
     }),
     { name: 'irs-theme' }
   )

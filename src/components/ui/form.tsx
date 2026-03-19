@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 /* ─── Label ─── */
 interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
@@ -40,10 +40,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       <select
         ref={ref}
         className={cn(
-          'h-11 w-full appearance-none rounded-lg border px-4 py-2.5 pr-10 text-sm shadow-theme-xs focus:outline-none focus:ring-3 dark:bg-gray-900 dark:text-white/90',
+          'shadow-theme-xs h-11 w-full appearance-none rounded-lg border px-4 py-2.5 pr-10 text-sm focus:ring-3 focus:outline-none dark:bg-gray-900 dark:text-white/90',
           error
             ? 'border-error-500 focus:ring-error-500/10'
-            : 'border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800',
+            : 'focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 border-gray-300 dark:border-gray-700',
           className
         )}
         {...props}
@@ -76,7 +76,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, hint, className, id, required, ...props }, ref) => (
     <div>
       {label && (
-        <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor={id}
+          className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           {label}
           {required && <span className="text-error-500 ml-0.5">*</span>}
         </label>
@@ -86,10 +89,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         id={id}
         required={required}
         className={cn(
-          'w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-3 dark:bg-gray-900 dark:text-white/90',
+          'shadow-theme-xs w-full rounded-lg border px-4 py-2.5 text-sm placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:bg-gray-900 dark:text-white/90',
           error
             ? 'border-error-500 focus:ring-error-500/10'
-            : 'border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700',
+            : 'focus:border-brand-300 focus:ring-brand-500/10 border-gray-300 dark:border-gray-700',
           className
         )}
         {...props}

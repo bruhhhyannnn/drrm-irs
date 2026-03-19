@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { logActivity } from '@/lib/activity-logger';
+import { supabase, logActivity } from '@/lib';
 import toast from 'react-hot-toast';
 
 type SettingsTable =
@@ -58,7 +57,12 @@ export function useUpdateSetting(table: SettingsTable, module: ModuleName) {
 
   return useMutation({
     mutationFn: async ({ id, values }: { id: string; values: Record<string, unknown> }) => {
-      const { data, error } = await supabase.from(table).update(values).eq('id', id).select().single();
+      const { data, error } = await supabase
+        .from(table)
+        .update(values)
+        .eq('id', id)
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },

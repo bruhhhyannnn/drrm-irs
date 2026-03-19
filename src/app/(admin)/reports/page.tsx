@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Search } from 'lucide-react';
-import { useReports } from '@/hooks/use-reports';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
+import { useReports } from '@/hooks';
+import { PageBreadcrumb } from '@/components/common';
 import {
   Table,
   TableHeader,
@@ -12,10 +12,12 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Pagination } from '@/components/ui/pagination';
+  Badge,
+  Input,
+  Pagination,
+  Spinner,
+  PageError,
+} from '@/components/ui';
 import type { Report } from '@/types/database';
 
 const PER_PAGE = 10;
@@ -39,8 +41,8 @@ export default function ReportsPage() {
     (r.nonacademicstaff ?? 0) +
     (r.guests ?? 0);
 
-  if (isLoading) return <Spinner />;
-  if (error) return <Err message={error.message} />;
+  if (isLoading) return <Spinner center />;
+  if (error) return <PageError message={error.message} />;
 
   const totalPages = Math.ceil((data?.total ?? 0) / PER_PAGE);
 
@@ -127,22 +129,6 @@ export default function ReportsPage() {
       </Table>
 
       <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-    </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <div className="flex h-[50vh] items-center justify-center">
-      <div className="border-brand-500 h-10 w-10 animate-spin rounded-full border-4 border-t-transparent" />
-    </div>
-  );
-}
-
-function Err({ message }: { message: string }) {
-  return (
-    <div className="flex h-[50vh] items-center justify-center">
-      <p className="text-error-500">{message}</p>
     </div>
   );
 }

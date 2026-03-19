@@ -6,11 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useAuthStore } from '@/store/auth.store';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
+import { supabase } from '@/lib';
+import { useAuthStore } from '@/store';
+import { Button, Input, Label } from '@/components/ui';
 
 const signInSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -79,8 +77,7 @@ export function SignInForm() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
-          {/* <Label htmlFor="email">Email</Label> */}
-          <label htmlFor="email">Email</label>
+          <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             type="email"
@@ -92,8 +89,7 @@ export function SignInForm() {
         </div>
 
         <div className="space-y-1.5">
-          {/* <Label htmlFor="password">Password</Label> */}
-          <label htmlFor="password">Password</label>
+          <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Input
               id="password"

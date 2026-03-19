@@ -1,6 +1,6 @@
 'use client';
 
-import { useSidebarStore } from '@/store/sidebar.store';
+import { useSidebarStore } from '@/store';
 
 export function Backdrop() {
   const { isMobileOpen, closeMobile } = useSidebarStore();

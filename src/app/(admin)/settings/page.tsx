@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
+import { PageBreadcrumb } from '@/components/common';
 import { ChevronRight } from 'lucide-react';
 
 const settings = [

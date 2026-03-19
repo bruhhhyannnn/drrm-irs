@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 interface DropdownProps {
   isOpen: boolean;
@@ -33,7 +33,7 @@ export function Dropdown({ isOpen, onClose, children, className }: DropdownProps
     <div
       ref={ref}
       className={cn(
-        'absolute right-0 z-40 mt-2 rounded-xl border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark',
+        'shadow-theme-lg dark:bg-gray-dark absolute right-0 z-40 mt-2 rounded-xl border border-gray-200 bg-white dark:border-gray-800',
         className
       )}
     >

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib';
 import {
   format,
   startOfMonth,
@@ -14,8 +14,8 @@ import {
   subMonths,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
-import { Badge } from '@/components/ui/badge';
+import { PageBreadcrumb } from '@/components/common';
+import { Badge } from '@/components/ui';
 
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());

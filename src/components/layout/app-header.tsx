@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import { Menu, X, Sun, Moon } from 'lucide-react';
-import { useSidebarStore } from '@/store/sidebar.store';
-import { useThemeStore } from '@/store/theme.store';
-import { useAuthStore } from '@/store/auth.store';
-import { Dropdown, DropdownItem } from '@/components/ui/dropdown';
-import { SignOutButton } from '@/components/auth/sign-out-button';
+import { useSidebarStore, useThemeStore } from '@/store';
+import { useAuthStore } from '@/store';
+import { Dropdown, DropdownItem } from '@/components/ui';
+import { SignOutButton } from '@/components/auth';
 import { ChevronDown } from 'lucide-react';
 
 export function AppHeader() {

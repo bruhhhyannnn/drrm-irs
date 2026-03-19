@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Search, Plus, Pencil } from 'lucide-react';
-import { useUsers } from '@/hooks/use-queries';
-import { supabase } from '@/lib/supabase';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
+import { useUsers } from '@/hooks';
+import { supabase } from '@/lib';
+import { PageBreadcrumb } from '@/components/common';
 import {
   Table,
   TableHeader,
@@ -13,10 +13,11 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+  Badge,
+  Input,
+  Button,
+  Spinner,
+} from '@/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
@@ -81,7 +82,7 @@ export default function UsersPage() {
           {isLoading ? (
             <TableRow>
               <TableCell className="py-10 text-center" colSpan={8}>
-                <div className="border-brand-500 mx-auto h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+                <Spinner center />
               </TableCell>
             </TableRow>
           ) : (

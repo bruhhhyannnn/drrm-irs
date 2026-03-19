@@ -1,10 +1,8 @@
 'use client';
 
-import { AppSidebar } from '@/components/layout/app-sidebar';
-import { AppHeader } from '@/components/layout/app-header';
-import { Backdrop } from '@/components/layout/backdrop';
-import { ProtectedRoute } from '@/components/auth/protected-route';
-import { useSidebarStore } from '@/store/sidebar.store';
+import { AppSidebar, AppHeader, Backdrop } from '@/components/layout';
+import { ProtectedRoute } from '@/components/auth';
+import { useSidebarStore } from '@/store';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebarStore();
@@ -13,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     ? 'ml-0'
     : isExpanded || isHovered
       ? 'lg:ml-[290px]'
-      : 'lg:ml-[90px]';
+      : 'lg:ml-[80px]';
 
   return (
     <ProtectedRoute>

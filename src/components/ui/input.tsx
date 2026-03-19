@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -13,7 +13,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative">
         {label && (
-          <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor={id}
+            className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             {label}
             {required && <span className="text-error-500 ml-0.5">*</span>}
           </label>
@@ -23,13 +26,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           id={id}
           required={required}
           className={cn(
-            'h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30',
+            'shadow-theme-xs h-11 w-full rounded-lg border px-4 py-2.5 text-sm placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30',
             error
               ? 'border-error-500 text-error-800 focus:ring-error-500/10 dark:border-error-500 dark:text-error-400'
               : success
                 ? 'border-success-400 text-success-500 focus:ring-success-500/10 dark:border-success-500 dark:text-success-400'
-                : 'border-gray-300 bg-transparent text-gray-800 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800',
-            props.disabled && 'cursor-not-allowed border-gray-300 bg-gray-50 text-gray-500 dark:bg-gray-800',
+                : 'focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 border-gray-300 bg-transparent text-gray-800 dark:border-gray-700',
+            props.disabled &&
+              'cursor-not-allowed border-gray-300 bg-gray-50 text-gray-500 dark:bg-gray-800',
             className
           )}
           {...props}

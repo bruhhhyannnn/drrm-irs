@@ -1,5 +1,5 @@
 // src/app/(admin)/settings/event-scenarios/page.tsx
-import { SettingsTablePage } from '@/components/settings/settings-table-page';
+import { SettingsTablePage } from '@/components/settings';
 export default function EventScenariosPage() {
   return (
     <SettingsTablePage

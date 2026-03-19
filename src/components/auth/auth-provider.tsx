@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuthStore } from '@/store/auth.store';
+import { supabase } from '@/lib';
+import { useAuthStore } from '@/store';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setSession, setUserProfile, setLoading } = useAuthStore();

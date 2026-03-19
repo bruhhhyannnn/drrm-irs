@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useCallback } from 'react';
-import { useSidebarStore } from '@/store/sidebar.store';
+import { useSidebarStore } from '@/store';
 import {
   LayoutDashboard,
   ScrollText,
@@ -15,7 +15,7 @@ import {
   Settings,
   ChevronDown,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 type NavItem = {
   name: string;
@@ -100,7 +100,7 @@ export function AppSidebar() {
           {isVisible && (
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">IRS</span>
-              <span className="text-xs text-gray-500">DRRM System</span>
+              <span className="text-xs text-gray-500">DRRM-H System</span>
             </div>
           )}
         </Link>
@@ -197,7 +197,7 @@ export function AppSidebar() {
       {/* Footer */}
       {isVisible && (
         <div className="border-t border-gray-200 p-4 dark:border-gray-800">
-          <p className="text-center text-xs text-gray-400">UP Manila DRRM © 2025</p>
+          <p className="text-center text-xs text-gray-400">UP Manila DRRM-H © 2025</p>
         </div>
       )}
     </aside>

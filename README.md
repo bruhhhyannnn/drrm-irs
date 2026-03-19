@@ -1,4 +1,4 @@
-# UPM DRRM — Incident Reporting System
+# UPM DRRM-H — Incident Reporting System
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
@@ -6,13 +6,13 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.0-38BDF8?logo=tailwindcss)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## **Web Dashboard for the UP Manila Disaster Risk Reduction Management Incident Reporting System**
+## **Web Dashboard for the UP Manila Disaster Risk Reduction and Management in Health Incident Reporting System**
 
 ---
 
 ## About
 
-This is the **admin web dashboard** for the UPM DRRM Incident Reporting System — a platform designed to manage, monitor, and analyze incident reports submitted by field teams across the UP Manila campus during drills, emergencies, and other DRRM-related events.
+This is the **admin web dashboard** for the UPM DRRM-H Incident Reporting System — a platform designed to manage, monitor, and analyze incident reports submitted by field teams across the UP Manila campus during drills, emergencies, and other DRRM-H-related events.
 
 The system works alongside a companion Flutter mobile app used by field personnel to submit real-time reports. Data flows from the mobile app into Supabase, and this dashboard gives administrators a centralized view of all incidents, headcounts, drill statuses, and post-event summaries.
 
@@ -29,7 +29,7 @@ The system works alongside a companion Flutter mobile app used by field personne
 
 ### System Context
 
-The IRS is part of a broader DRRM platform consisting of:
+The IRS is part of a broader DRRM-H platform consisting of:
 
 | Component          | Description                    |
 | ------------------ | ------------------------------ |
@@ -163,4 +163,4 @@ npm run lint:fix   # Auto-fix ESLint issues
 
 ## License
 
-MIT © 2026 Bryan Jesus Mangapit · UP Manila DRRM
+MIT © 2026 Bryan Jesus Mangapit · UP Manila DRRM-H

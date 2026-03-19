@@ -3,10 +3,9 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib';
 import { format } from 'date-fns';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
-import { Badge } from '@/components/ui/badge';
+import { PageBreadcrumb } from '@/components/common';
 import {
   Table,
   TableHeader,
@@ -14,7 +13,10 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui/table';
+  Badge,
+  Spinner,
+  PageLoader,
+} from '@/components/ui';
 
 function EventDetailsContent() {
   const searchParams = useSearchParams();
@@ -54,11 +56,7 @@ function EventDetailsContent() {
   });
 
   if (loadingEvent) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="border-brand-500 h-10 w-10 animate-spin rounded-full border-4 border-t-transparent" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!event) {
@@ -141,7 +139,7 @@ function EventDetailsContent() {
         </h2>
         {loadingReports ? (
           <div className="flex h-20 items-center justify-center">
-            <div className="border-brand-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+            <Spinner />
           </div>
         ) : (
           <Table>
@@ -231,13 +229,7 @@ function EventDetailsContent() {
 
 export default function EventDetailsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-[50vh] items-center justify-center">
-          <div className="border-brand-500 h-10 w-10 animate-spin rounded-full border-4 border-t-transparent" />
-        </div>
-      }
-    >
+    <Suspense fallback={<Spinner />}>
       <EventDetailsContent />
     </Suspense>
   );

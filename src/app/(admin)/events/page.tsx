@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Search, Eye } from 'lucide-react';
-import { useEvents } from '@/hooks/use-events';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
+import { useEvents } from '@/hooks';
+import { PageBreadcrumb } from '@/components/common';
 import {
   Table,
   TableHeader,
@@ -13,16 +13,18 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+  Badge,
+  Input,
+  Spinner,
+  PageError,
+} from '@/components/ui';
 
 export default function EventsPage() {
   const [query, setQuery] = useState('');
   const { data: events, isLoading, error } = useEvents(query);
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error.message} />;
+  if (isLoading) return <Spinner center />;
+  if (error) return <PageError message={error.message} />;
 
   return (
     <div className="space-y-6">
@@ -98,22 +100,6 @@ export default function EventsPage() {
           )}
         </TableBody>
       </Table>
-    </div>
-  );
-}
-
-function LoadingSpinner() {
-  return (
-    <div className="flex h-[50vh] items-center justify-center">
-      <div className="border-brand-500 h-10 w-10 animate-spin rounded-full border-4 border-t-transparent" />
-    </div>
-  );
-}
-
-function ErrorMessage({ message }: { message: string }) {
-  return (
-    <div className="flex h-[50vh] items-center justify-center">
-      <p className="text-error-500">{message}</p>
     </div>
   );
 }

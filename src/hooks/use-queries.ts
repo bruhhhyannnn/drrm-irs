@@ -1,12 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib';
 import type { User, ActivityLog, News } from '@/types/database';
 
 const PER_PAGE = 10;
 
 /* ─── Users ─── */
 async function fetchUsers(query?: string): Promise<User[]> {
-  let builder = supabase.from('users').select('*').order('created_at', { ascending: false }).limit(500);
+  let builder = supabase
+    .from('users')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(500);
 
   if (query) {
     const q = query.trim();
@@ -37,7 +41,9 @@ async function fetchActivityLogs(page: number, query?: string): Promise<Activity
   let builder = supabase.from('activity_logs').select('*', { count: 'exact' });
 
   if (query) {
-    builder = builder.or(`module.ilike.%${query}%,action.ilike.%${query}%,docName.ilike.%${query}%`);
+    builder = builder.or(
+      `module.ilike.%${query}%,action.ilike.%${query}%,docName.ilike.%${query}%`
+    );
   }
 
   const from = (page - 1) * PER_PAGE;

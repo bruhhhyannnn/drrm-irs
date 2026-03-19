@@ -5,11 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useCreateSetting, useUpdateSetting, useSettingsTable } from '@/hooks/use-settings';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { useCreateSetting, useUpdateSetting, useSettingsTable } from '@/hooks';
+import { PageBreadcrumb } from '@/components/common';
+import { Input, Label, Button } from '@/components/ui';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),

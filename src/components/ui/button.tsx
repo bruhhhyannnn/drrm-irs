@@ -17,8 +17,7 @@ const variantClasses = {
     'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-white/5',
   ghost:
     'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
-  danger:
-    'bg-error-500 text-white hover:bg-error-600 disabled:bg-error-300',
+  danger: 'bg-error-500 text-white hover:bg-error-600 disabled:bg-error-300',
 };
 
 const sizeClasses = {
@@ -64,7 +63,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
               <path
                 className="opacity-75"
                 fill="currentColor"

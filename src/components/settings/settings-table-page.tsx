@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
-import { useSettingsTable, useDeleteSetting } from '@/hooks/use-settings';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
+import { useSettingsTable, useDeleteSetting } from '@/hooks';
+import { PageBreadcrumb } from '@/components/common';
 import {
   Table,
   TableHeader,
@@ -13,10 +13,11 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+  Badge,
+  Button,
+  Input,
+  Spinner,
+} from '@/components/ui';
 
 type SettingsTable =
   | 'event-scenarios'
@@ -85,7 +86,7 @@ export function SettingsTablePage({ title, table, module, nameKey, basePath }: S
           {isLoading ? (
             <TableRow>
               <TableCell className="py-10 text-center" colSpan={4}>
-                <div className="border-brand-500 mx-auto h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+                <Spinner center />
               </TableCell>
             </TableRow>
           ) : (

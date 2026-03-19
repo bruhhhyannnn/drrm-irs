@@ -8,7 +8,13 @@ interface LogActivityParams {
   data?: Record<string, unknown>;
 }
 
-export async function logActivity({ action, docID, docName, module, data = {} }: LogActivityParams) {
+export async function logActivity({
+  action,
+  docID,
+  docName,
+  module,
+  data = {},
+}: LogActivityParams) {
   try {
     const {
       data: { user },

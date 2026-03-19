@@ -31,11 +31,26 @@ export const useAuthStore = create<AuthState>()(
       session: null,
       userProfile: null,
       loading: true,
-      setUser: (user) => set({ user }),
-      setSession: (session) => set({ session }),
-      setUserProfile: (userProfile) => set({ userProfile }),
-      setLoading: (loading) => set({ loading }),
-      reset: () => set({ user: null, session: null, userProfile: null, loading: false }),
+
+      setUser(user: User | null) {
+        set({ user });
+      },
+
+      setSession(session: Session | null) {
+        set({ session });
+      },
+
+      setUserProfile(userProfile: UserProfile | null) {
+        set({ userProfile });
+      },
+
+      setLoading(loading: boolean) {
+        set({ loading });
+      },
+
+      reset() {
+        set({ user: null, session: null, userProfile: null, loading: false });
+      },
     }),
     {
       name: 'irs-auth',

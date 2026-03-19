@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Search, Plus, Pencil } from 'lucide-react';
-import { useNews } from '@/hooks/use-queries';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
+import { useNews } from '@/hooks';
+import { PageBreadcrumb } from '@/components/common';
 import {
   Table,
   TableHeader,
@@ -13,11 +13,12 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/ui/pagination';
+  Badge,
+  Input,
+  Button,
+  Pagination,
+  Spinner,
+} from '@/components/ui';
 
 const PER_PAGE = 10;
 
@@ -65,7 +66,7 @@ export default function NewsPage() {
           {isLoading ? (
             <TableRow>
               <TableCell className="py-10 text-center" colSpan={6}>
-                <div className="border-brand-500 mx-auto h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+                <Spinner center />
               </TableCell>
             </TableRow>
           ) : (

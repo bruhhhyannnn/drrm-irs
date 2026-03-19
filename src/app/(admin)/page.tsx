@@ -1,9 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
-import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/lib';
+import { PageBreadcrumb } from '@/components/common';
+import { Badge } from '@/components/ui';
 import { format } from 'date-fns';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { CalendarDays, FileText, Users, AlertTriangle } from 'lucide-react';

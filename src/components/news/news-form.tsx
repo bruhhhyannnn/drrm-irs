@@ -5,13 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { logActivity } from '@/lib/activity-logger';
-import { newsSchema, type NewsFormData } from '@/lib/schemas';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
-import { Input } from '@/components/ui/input';
-import { Label, Select, Textarea } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { supabase, logActivity, newsSchema, type NewsFormData } from '@/lib';
+import { PageBreadcrumb } from '@/components/common';
+import { Input, Label, Select, Textarea, Button } from '@/components/ui';
 import { Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 

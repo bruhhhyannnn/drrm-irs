@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth.store';
+import { useAuthStore } from '@/store';
+import { Spinner } from '../ui';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -18,7 +19,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="border-brand-500 h-12 w-12 animate-spin rounded-full border-4 border-t-transparent" />
+        <Spinner size="lg" />
       </div>
     );
   }

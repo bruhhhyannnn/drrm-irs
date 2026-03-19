@@ -5,13 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { logActivity } from '@/lib/activity-logger';
-import { userSchema, type UserFormData } from '@/lib/schemas';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
-import { Input } from '@/components/ui/input';
-import { Label, Select } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { supabase, logActivity, userSchema, type UserFormData } from '@/lib';
+import { PageBreadcrumb } from '@/components/common';
+import { Input, Label, Select, Button } from '@/components/ui';
 import toast from 'react-hot-toast';
 
 const USER_TYPE_OPTIONS = [
