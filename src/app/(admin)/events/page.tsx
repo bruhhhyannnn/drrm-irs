@@ -55,14 +55,12 @@ export default function EventsPage() {
         </TableHeader>
         <TableBody>
           {events?.map((event) => (
-            <TableRow key={event.event_id}>
+            <TableRow key={event.id}>
               <TableCell>
-                {event.timestampstart
-                  ? format(new Date(event.timestampstart), 'MMM d, yyyy h:mm a')
-                  : '—'}
+                {event.started_at ? format(new Date(event.started_at), 'MMM d, yyyy h:mm a') : '—'}
               </TableCell>
               <TableCell className="font-medium text-gray-900 dark:text-white">
-                {event.eventname}
+                {event.event_name}
               </TableCell>
               <TableCell>{event.category}</TableCell>
               <TableCell>{event.location}</TableCell>
@@ -82,7 +80,7 @@ export default function EventsPage() {
               </TableCell>
               <TableCell>
                 <Link
-                  href={`/events/details?id=${event.event_id}`}
+                  href={`/events/details?id=${event.id}`}
                   className="text-brand-500 hover:text-brand-600 inline-flex items-center gap-1.5 text-sm"
                 >
                   <Eye size={14} />

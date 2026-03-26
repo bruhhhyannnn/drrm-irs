@@ -102,12 +102,12 @@ export default function UsersPage() {
                 </TableCell>
                 <TableCell>
                   <button
-                    onClick={() => handleToggleStatus(user.id, user.isActive ?? true)}
+                    onClick={() => handleToggleStatus(user.id, user.is_active ?? true)}
                     disabled={togglingId === user.id}
                     className="cursor-pointer"
                   >
-                    <Badge color={user.isActive ? 'success' : 'error'} size="sm">
-                      {user.isActive ? 'Active' : 'Inactive'}
+                    <Badge color={user.is_active ? 'success' : 'error'} size="sm">
+                      {user.is_active ? 'Active' : 'Inactive'}
                     </Badge>
                   </button>
                 </TableCell>

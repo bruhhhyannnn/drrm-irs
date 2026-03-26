@@ -74,10 +74,10 @@ export default function ActivityLogsPage() {
             data?.data.map((log) => (
               <TableRow key={log.id}>
                 <TableCell>
-                  {log.datecreated ? format(new Date(log.datecreated), 'MMM d, yyyy h:mm a') : '—'}
+                  {log.created_at ? format(new Date(log.created_at), 'MMM d, yyyy h:mm a') : '—'}
                 </TableCell>
                 <TableCell className="font-medium">{log.module}</TableCell>
-                <TableCell>{log.docName}</TableCell>
+                <TableCell>{log.doc_name}</TableCell>
                 <TableCell>
                   <Badge
                     color={actionColor[log.action as keyof typeof actionColor] ?? 'light'}
@@ -87,7 +87,7 @@ export default function ActivityLogsPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-xs">
-                  {log.initiatedByDisplay ?? log.initiatedBy}
+                  {log.initiated_by_display ?? log.initiated_by}
                 </TableCell>
               </TableRow>
             ))

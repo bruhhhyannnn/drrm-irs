@@ -1,21 +1,31 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase, logActivity } from '@/lib';
+import { supabase } from '@/lib/supabase';
+import { logActivity } from '@/lib/activity-logger';
 import toast from 'react-hot-toast';
 
-type SettingsTable =
-  | 'event-scenarios'
-  | 'event-actions'
+export type SettingsTable =
+  | 'event_scenarios'
+  | 'event_actions'
   | 'locations'
-  | 'user-types'
-  | 'colleges-units'
-  | 'buildings-zones'
-  | 'observee-areas'
-  | 'observee-roles'
+  | 'user_types'
+  | 'college_units'
+  | 'observee_areas'
+  | 'observee_roles'
   | 'remarks';
 
-type ModuleName = string;
+// Maps each table to its display name column
+export const NAME_KEY_MAP: Record<SettingsTable, string> = {
+  event_scenarios: 'scenario_name',
+  event_actions: 'action_name',
+  locations: 'location_name',
+  user_types: 'type_name',
+  college_units: 'name',
+  observee_areas: 'area_name',
+  observee_roles: 'role_name',
+  remarks: 'remark_name',
+};
 
-/* ─── Generic fetch for any settings table ─── */
+/* ─── Fetch all rows from a settings table ──────────────── */
 async function fetchSettingsTable(table: SettingsTable) {
   const { data, error } = await supabase
     .from(table)
@@ -32,9 +42,28 @@ export function useSettingsTable(table: SettingsTable) {
   });
 }
 
-/* ─── Generic create mutation ─── */
-export function useCreateSetting(table: SettingsTable, module: ModuleName) {
+/* ─── Fetch college_units filtered by cluster ───────────── */
+export function useCollegeUnits(cluster?: string) {
+  return useQuery({
+    queryKey: ['college_units', cluster],
+    queryFn: async () => {
+      let builder = supabase.from('college_units').select('*').eq('is_active', true).order('name');
+
+      if (cluster) {
+        builder = builder.eq('cluster', cluster);
+      }
+
+      const { data, error } = await builder;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+/* ─── Create ─────────────────────────────────────────────── */
+export function useCreateSetting(table: SettingsTable, module: string) {
   const queryClient = useQueryClient();
+  const nameKey = NAME_KEY_MAP[table];
 
   return useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
@@ -44,16 +73,22 @@ export function useCreateSetting(table: SettingsTable, module: ModuleName) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [table] });
-      logActivity({ action: 'create', docID: data.id, docName: data.name ?? data.id, module });
+      logActivity({
+        action: 'create',
+        docId: data.id,
+        docName: String(data[nameKey] ?? data.id),
+        module,
+      });
       toast.success('Created successfully');
     },
     onError: (err: Error) => toast.error(err.message),
   });
 }
 
-/* ─── Generic update mutation ─── */
-export function useUpdateSetting(table: SettingsTable, module: ModuleName) {
+/* ─── Update ─────────────────────────────────────────────── */
+export function useUpdateSetting(table: SettingsTable, module: string) {
   const queryClient = useQueryClient();
+  const nameKey = NAME_KEY_MAP[table];
 
   return useMutation({
     mutationFn: async ({ id, values }: { id: string; values: Record<string, unknown> }) => {
@@ -68,15 +103,20 @@ export function useUpdateSetting(table: SettingsTable, module: ModuleName) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [table] });
-      logActivity({ action: 'update', docID: data.id, docName: data.name ?? data.id, module });
+      logActivity({
+        action: 'update',
+        docId: data.id,
+        docName: String(data[nameKey] ?? data.id),
+        module,
+      });
       toast.success('Updated successfully');
     },
     onError: (err: Error) => toast.error(err.message),
   });
 }
 
-/* ─── Generic delete mutation ─── */
-export function useDeleteSetting(table: SettingsTable, module: ModuleName) {
+/* ─── Delete ─────────────────────────────────────────────── */
+export function useDeleteSetting(table: SettingsTable, module: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -87,7 +127,12 @@ export function useDeleteSetting(table: SettingsTable, module: ModuleName) {
     },
     onSuccess: (id) => {
       queryClient.invalidateQueries({ queryKey: [table] });
-      logActivity({ action: 'delete', docID: id, docName: id, module });
+      logActivity({
+        action: 'delete',
+        docId: id,
+        docName: id,
+        module,
+      });
       toast.success('Deleted successfully');
     },
     onError: (err: Error) => toast.error(err.message),

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib';
+import { supabase } from '@/lib/supabase';
 import type { Event } from '@/types/database';
 
 async function fetchEvents(query?: string): Promise<Event[]> {
@@ -10,7 +10,7 @@ async function fetchEvents(query?: string): Promise<Event[]> {
     .limit(100);
 
   if (query) {
-    builder = builder.ilike('eventname', `%${query}%`);
+    builder = builder.ilike('event_name', `%${query}%`);
   }
 
   const { data, error } = await builder;
@@ -22,5 +22,17 @@ export function useEvents(query?: string) {
   return useQuery({
     queryKey: ['events', query],
     queryFn: () => fetchEvents(query),
+  });
+}
+
+export function useEvent(id?: string) {
+  return useQuery({
+    queryKey: ['event', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('events').select('*').eq('id', id).single();
+      if (error) throw error;
+      return data as Event;
+    },
+    enabled: !!id,
   });
 }

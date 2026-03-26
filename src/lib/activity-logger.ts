@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 
 interface LogActivityParams {
   action: 'create' | 'update' | 'delete';
-  docID: string;
+  docId: string;
   docName: string;
   module: string;
   data?: Record<string, unknown>;
@@ -10,7 +10,7 @@ interface LogActivityParams {
 
 export async function logActivity({
   action,
-  docID,
+  docId,
   docName,
   module,
   data = {},
@@ -20,7 +20,7 @@ export async function logActivity({
       data: { user },
     } = await supabase.auth.getUser();
 
-    const userUid = user?.id ?? 'system';
+    const userId = user?.id ?? null;
     const userEmail = user?.email ?? 'system';
     const displayName = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? '';
     const initiatedByDisplay = displayName ? `${displayName} | ${userEmail}` : userEmail;
@@ -34,19 +34,19 @@ export async function logActivity({
 
     const { error } = await supabase.from('activity_logs').insert({
       action,
-      data: serializableData,
-      dateCreated: new Date().toISOString(),
-      docID,
-      docName,
       module,
-      initiatedBy: userUid,
-      initiatedByEmail: userEmail,
-      initiatedByDisplay,
+      doc_id: docId,
+      doc_name: docName,
+      initiated_by: userId,
+      initiated_by_email: userEmail,
+      initiated_by_display: initiatedByDisplay,
+      data: serializableData,
       status: 'success',
+      created_at: new Date().toISOString(),
     });
 
     if (error) throw error;
   } catch (error) {
-    console.error('[ActivityLog] Error logging activity:', error);
+    console.error('[ActivityLog] Error:', error);
   }
 }

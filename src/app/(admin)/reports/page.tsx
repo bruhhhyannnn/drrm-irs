@@ -29,16 +29,16 @@ export default function ReportsPage() {
 
   const totalAffected = (r: Report) =>
     (r.students ?? 0) +
-    (r.facultymembers ?? 0) +
-    (r.adminmembers ?? 0) +
-    (r.repsmembers ?? 0) +
-    (r.ramembers ?? 0) +
-    (r.philcarestaff ?? 0) +
-    (r.securitypersonnel ?? 0) +
-    (r.constructionworkers ?? 0) +
+    (r.faculty_members ?? 0) +
+    (r.admin_members ?? 0) +
+    (r.reps_members ?? 0) +
+    (r.ra_members ?? 0) +
+    (r.philcare_staff ?? 0) +
+    (r.security_personnel ?? 0) +
+    (r.construction_workers ?? 0) +
     (r.tenants ?? 0) +
-    (r.healthworkers ?? 0) +
-    (r.nonacademicstaff ?? 0) +
+    (r.health_workers ?? 0) +
+    (r.non_academic_staff ?? 0) +
     (r.guests ?? 0);
 
   if (isLoading) return <Spinner center />;
@@ -83,7 +83,7 @@ export default function ReportsPage() {
           {data?.data.map((report) => (
             <TableRow key={report.id}>
               <TableCell className="font-medium text-gray-900 dark:text-white">
-                {report.eventname}
+                {report.event_id}
               </TableCell>
               <TableCell>
                 <Badge color="primary" size="sm">
@@ -92,22 +92,22 @@ export default function ReportsPage() {
               </TableCell>
               <TableCell>{report.office}</TableCell>
               <TableCell className="max-w-50 truncate">
-                {report.exactlocation || report.bldg_name}
+                {report.exact_location || report.bldgname}
               </TableCell>
               <TableCell className="font-medium">{totalAffected(report)}</TableCell>
               <TableCell>
-                {report.numcasualties > 0 ? (
+                {report.casualties_count > 0 ? (
                   <Badge color="error" size="sm">
-                    {report.numcasualties}
+                    {report.casualties_count}
                   </Badge>
                 ) : (
                   <span className="text-gray-400">0</span>
                 )}
               </TableCell>
               <TableCell>
-                {report.nummissingpersons > 0 ? (
+                {report.missing_count > 0 ? (
                   <Badge color="warning" size="sm">
-                    {report.nummissingpersons}
+                    {report.missing_count}
                   </Badge>
                 ) : (
                   <span className="text-gray-400">0</span>

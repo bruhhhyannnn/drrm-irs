@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useCreateSetting, useUpdateSetting, useSettingsTable } from '@/hooks';
+import { useCreateSetting, useUpdateSetting, useSettingsTable, SettingsTable } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import { Input, Label, Button } from '@/components/ui';
 
@@ -15,17 +15,6 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-
-type SettingsTable =
-  | 'event-scenarios'
-  | 'event-actions'
-  | 'locations'
-  | 'user-types'
-  | 'colleges-units'
-  | 'buildings-zones'
-  | 'observee-areas'
-  | 'observee-roles'
-  | 'remarks';
 
 interface SettingsFormProps {
   title: string;

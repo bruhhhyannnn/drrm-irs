@@ -70,7 +70,7 @@ export function NewsForm({ editId }: NewsFormProps) {
         if (error) throw error;
         await logActivity({
           action: 'update',
-          docID: editId!,
+          docId: editId!,
           docName: data.title,
           module: 'News',
         });
@@ -83,7 +83,7 @@ export function NewsForm({ editId }: NewsFormProps) {
         if (error) throw error;
         await logActivity({
           action: 'create',
-          docID: created.id,
+          docId: created.id,
           docName: data.title,
           module: 'News',
         });

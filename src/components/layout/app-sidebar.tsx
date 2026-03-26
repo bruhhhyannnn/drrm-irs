@@ -26,12 +26,12 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { icon: <LayoutDashboard size={20} />, name: 'Home', path: '/' },
-  { icon: <ScrollText size={20} />, name: 'Activity Logs', path: '/activity-logs' },
   { icon: <CalendarDays size={20} />, name: 'Events', path: '/events' },
-  { icon: <BarChart2 size={20} />, name: 'Reports', path: '/reports' },
-  { icon: <Users size={20} />, name: 'Users', path: '/users' },
-  { icon: <Calendar size={20} />, name: 'Calendar', path: '/calendar' },
   { icon: <Newspaper size={20} />, name: 'News', path: '/news' },
+  { icon: <BarChart2 size={20} />, name: 'Reports', path: '/reports' },
+  { icon: <Calendar size={20} />, name: 'Calendar', path: '/calendar' },
+  { icon: <Users size={20} />, name: 'Users', path: '/users' },
+  { icon: <ScrollText size={20} />, name: 'Activity Logs', path: '/activity-logs' },
   {
     icon: <Settings size={20} />,
     name: 'Settings',
