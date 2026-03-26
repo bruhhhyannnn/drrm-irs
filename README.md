@@ -264,169 +264,198 @@ config:
 erDiagram
   users {
     uuid id PK
-    uuid authid FK
-    string username
-    string firstname
-    string middlename
-    string lastname
-    string suffix
-    string email
-    string cluster
-    string office
-    string bldgname
-    string encoder_position
+    uuid authid UK
+    text username UK
+    text firstname
+    text middlename
+    text lastname
+    text suffix
+    text email UK
+    text cluster
+    text office
+    text college_unit
+    text bldgname
+    text encoder_position
+    text role_specify
     int usertype
-    string zone
-    boolean isActive
-    timestamp created_at
+    text zone
+    bool is_active
+    timestamptz created_at
+    timestamptz updated_at
   }
 
   events {
-    uuid event_id PK
-    string eventname
-    string eventdescription
-    string category
-    string location
-    string status
-    boolean eventstarted
-    string incidentcommander
-    string liasonofficer
-    string safetysecurityofficer
-    string publicinformationofficer
-    timestamp timestampstart
-    timestamp timestampend
-    timestamp created_at
+    uuid id PK
+    text event_name
+    text event_description
+    text category
+    text quarter
+    text status
+    bool event_started
+    text location
+    text incident_commander
+    text liaison_officer
+    text safety_security_officer
+    text public_information_officer
+    timestamptz started_at
+    timestamptz ended_at
+    uuid created_by FK
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  report_assignments {
+    uuid id PK
+    uuid event_id FK
+    text cluster
+    text office
+    text college_unit
+    text bldgname
+    timestamptz created_at
   }
 
   reports {
     uuid id PK
     uuid event_id FK
     uuid encoder_id FK
-    string encoder_position
-    string cluster
-    string office
-    string bldg_name
-    string exactlocation
-    string event_type
-    string hazard_type
+    text encoder_name
+    text encoder_position
+    text role_specify
+    text cluster
+    text office
+    text college_unit
+    text bldgname
+    text exact_location
+    text gps_location
+    text event_type
+    text hazard_type
+    int faculty_members
+    int admin_members
+    int reps_members
+    int ra_members
     int students
-    int facultymembers
-    int adminmembers
-    int repsmembers
-    int ramembers
-    int philcarestaff
-    int securitypersonnel
-    int constructionworkers
+    int philcare_staff
+    int security_personnel
+    int construction_workers
     int tenants
-    int healthworkers
-    int nonacademicstaff
+    int health_workers
+    int non_academic_staff
     int guests
-    int nummissingpersons
-    int numcasualties
-    string namesofmissingpersons
-    string identityandconditionofcasualties
-    string damageassessment
-    timestamp created_at
-    timestamp last_modified
+    int missing_count
+    text missing_names
+    int casualties_count
+    text casualties_detail
+    text damage_report
+    text external_item_id
+    timestamptz submitted_at
+    timestamptz created_at
+    timestamptz updated_at
   }
 
-  activity_logs {
+  checklists {
     uuid id PK
-    string action
-    string module
-    string docID
-    string docName
-    string initiatedBy
-    string initiatedByEmail
-    string initiatedByDisplay
-    json data
-    string status
-    timestamp datecreated
+    uuid event_id FK
+    uuid assigned_to FK
+    text action
+    bool is_done
+    timestamptz completed_at
+    timestamptz created_at
   }
 
   news {
     uuid id PK
-    string title
-    string content
-    string author
-    string category
-    boolean is_active
-    string image_url
-    string source_url
-    timestamp published_at
-    timestamp created_at
-    timestamp updated_at
+    text title
+    text content
+    text author
+    text category
+    bool is_active
+    text image_url
+    text source_url
+    timestamptz published_at
+    timestamptz created_at
+    timestamptz updated_at
   }
 
-  buildings_zones {
+  activity_logs {
     uuid id PK
-    uuid collegeID FK
-    string buildingName
-    boolean isActive
-    timestamp created_at
-  }
-
-  colleges_units {
-    uuid id PK
-    string collegeName
-    boolean isActive
-    timestamp created_at
+    uuid initiated_by FK
+    text action
+    text module
+    text doc_id
+    text doc_name
+    text initiated_by_email
+    text initiated_by_display
+    jsonb data
+    text status
+    timestamptz created_at
   }
 
   locations {
     uuid id PK
-    string locationName
-    boolean isActive
-    timestamp created_at
+    text location_name
+    bool is_active
+    timestamptz created_at
+  }
+
+  college_units {
+    uuid id PK
+    text name
+    text cluster
+    bool is_active
+    timestamptz created_at
   }
 
   event_scenarios {
     uuid id PK
-    string scenarioName
-    string description
-    boolean isActive
-    timestamp created_at
+    text scenario_name
+    text description
+    bool is_active
+    timestamptz created_at
   }
 
   event_actions {
     uuid id PK
-    string actionName
-    string description
-    boolean isActive
-    timestamp created_at
+    text action_name
+    text description
+    bool is_active
+    timestamptz created_at
   }
 
   observee_areas {
     uuid id PK
-    string areaName
-    boolean isActive
-    timestamp created_at
+    text area_name
+    bool is_active
+    timestamptz created_at
   }
 
   observee_roles {
     uuid id PK
-    string roleName
-    boolean isActive
-    timestamp created_at
+    text role_name
+    bool is_active
+    timestamptz created_at
   }
 
   remarks {
     uuid id PK
-    string remarkName
-    boolean isActive
-    timestamp created_at
+    text remark_name
+    bool is_active
+    timestamptz created_at
   }
 
   user_types {
     uuid id PK
-    string typeName
-    boolean isActive
-    timestamp created_at
+    text type_name
+    bool is_active
+    timestamptz created_at
   }
 
-  events ||--o{ reports : "has many"
-  users ||--o{ reports : "submits"
-  colleges_units ||--o{ buildings_zones : "has many"
+  users ||--o{ events : "created_by"
+  users ||--o{ reports : "submitted_by"
+  users ||--o{ checklists : "assigned_to"
+  users ||--o{ activity_logs : "initiated_by"
+  events ||--o{ report_assignments : "has"
+  events ||--o{ reports : "has"
+  events ||--o{ checklists : "has"
 ```
 
 ## Flowchart Diagram
@@ -473,7 +502,6 @@ npm run lint:fix   # Auto-fix ESLint issues
 ## Developer
 
 **Bryan Mangapit** — Lead Developer
-**Sharah Tuando** — Frontend Design Specialist
 [bruhhhyannnn.framer.website](https://bruhhhyannnn.framer.website) · [GitHub](https://github.com/bruhhhyannnn) · [LinkedIn](https://linkedin.com/in/bryanmangapit)
 
 ---
