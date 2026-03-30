@@ -5,12 +5,19 @@ import { Providers } from '@/components/providers';
 
 const outfit = Outfit({ subsets: ['latin'] });
 
+  title: 'UPM DRRM-H IRS',
+  description: 'UP Manila Disaster Risk Reduction Management in Health Incident Reporting System',
+>>>>>>> Stashed changes
+=======
 export const metadata: Metadata = {
-  title: 'UPM DRRM-H - IRS',
-  description:
-    'UP Manila Disaster Risk Reduction Management and Health Program - Incident Reporting System',
+  title: 'UPM DRRM-H IRS',
+  description: 'UP Manila Disaster Risk Reduction Management in Health Incident Reporting System',
+=======
+  title: 'UPM DRRM-H IRS',
+  description: 'UP Manila Disaster Risk Reduction Management in Health Incident Reporting System',
+>>>>>>> Stashed changes
   icons: {
-    icon: '/logo.svg',
+    icon: '/irs-logo.png',
   },
 };
 

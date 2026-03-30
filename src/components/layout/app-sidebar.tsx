@@ -15,7 +15,17 @@ import {
   Settings,
   ChevronDown,
 } from 'lucide-react';
-import { cn } from '@/lib';
+<<<<<<< Updated upstream
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
+>>>>>>> Stashed changes
+=======
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
+=======
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
+>>>>>>> Stashed changes
 
 type NavItem = {
   name: string;
@@ -94,13 +104,25 @@ export function AppSidebar() {
         )}
       >
         <Link href="/" className="flex items-center gap-3">
-          <div className="bg-brand-500 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white">
-            UPM
-          </div>
+<Image
+src="/irs-logo.png"
+            alt="IRS Logo"
+            width={36}
+            height={36}
+            className="h-9 w-9 shrink-0 rounded-lg"
+          />
           {isVisible && (
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">Incident Reporting System</span>
+              <span className="text-xs text-gray-500">UP Manila DRRM -H</span>
+>>>>>>> Stashed changes
+=======
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">IRS</span>
-              <span className="text-xs text-gray-500">DRRM-H System</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">Incident Reporting System</span>
+              <span className="text-xs text-gray-500">UP Manila DRRM -H</span>
+=======
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">Incident Reporting System</span>
+              <span className="text-xs text-gray-500">UP Manila DRRM -H</span>
+>>>>>>> Stashed changes
             </div>
           )}
         </Link>

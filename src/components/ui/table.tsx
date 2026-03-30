@@ -1,9 +1,23 @@
 import React from 'react';
 import { cn } from '@/lib';
 
-export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
+/**
+ * Table — styled to match the mobile app's clean card surfaces:
+ *  • rounded-2xl container with soft border & shadow
+ *  • warm gray header (matches _surfaceGray #F1F5F9)
+ *  • red-tinted hover rows (matches mobile list-item hover feel)
+ *  • generous padding & clear typographic hierarchy
+ */
+
+export function Table({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+    <div className="overflow-hidden rounded-2xl border-2 border-gray-100 bg-white shadow-sm dark:border-white/5 dark:bg-white/3">
       <div className="max-w-full overflow-x-auto">
         <table className={cn('w-full border-collapse', className)}>{children}</table>
       </div>
@@ -19,7 +33,12 @@ export function TableHeader({
   className?: string;
 }) {
   return (
-    <thead className={cn('border-b border-gray-100 dark:border-white/5', className)}>
+    <thead
+      className={cn(
+        'border-b-2 border-gray-100 bg-gray-50 dark:border-white/5 dark:bg-white/3',
+        className
+      )}
+    >
       {children}
     </thead>
   );
@@ -33,7 +52,7 @@ export function TableBody({
   className?: string;
 }) {
   return (
-    <tbody className={cn('divide-y divide-gray-100 dark:divide-white/5', className)}>
+    <tbody className={cn('divide-y divide-gray-50 dark:divide-white/5', className)}>
       {children}
     </tbody>
   );
@@ -46,7 +65,16 @@ export function TableRow({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <tr className={cn('hover:bg-gray-50 dark:hover:bg-white/2', className)}>{children}</tr>;
+  return (
+    <tr
+      className={cn(
+        'transition-colors duration-150 hover:bg-red-50/40 dark:hover:bg-white/2',
+        className
+      )}
+    >
+      {children}
+    </tr>
+  );
 }
 
 export function TableHead({
@@ -59,7 +87,7 @@ export function TableHead({
   return (
     <th
       className={cn(
-        'text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400',
+        'px-5 py-3.5 text-start text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400',
         className
       )}
     >
@@ -80,7 +108,10 @@ export function TableCell({
   return (
     <td
       colSpan={colSpan}
-      className={cn('text-theme-sm px-5 py-3 text-gray-600 dark:text-gray-300', className)}
+      className={cn(
+        'px-5 py-4 text-sm text-gray-600 dark:text-gray-300',
+        className
+      )}
     >
       {children}
     </td>
