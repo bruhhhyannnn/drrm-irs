@@ -15,17 +15,8 @@ import {
   Settings,
   ChevronDown,
 } from 'lucide-react';
-<<<<<<< Updated upstream
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
->>>>>>> Stashed changes
-=======
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
-=======
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
->>>>>>> Stashed changes
 
 type NavItem = {
   name: string;
@@ -104,25 +95,17 @@ export function AppSidebar() {
         )}
       >
         <Link href="/" className="flex items-center gap-3">
-<Image
-src="/irs-logo.png"
+          <Image
+            src="/irs-logo.png"
             alt="IRS Logo"
             width={36}
             height={36}
             className="h-9 w-9 shrink-0 rounded-lg"
           />
           {isVisible && (
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">Incident Reporting System</span>
-              <span className="text-xs text-gray-500">UP Manila DRRM -H</span>
->>>>>>> Stashed changes
-=======
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">Incident Reporting System</span>
               <span className="text-xs text-gray-500">UP Manila DRRM -H</span>
-=======
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">Incident Reporting System</span>
-              <span className="text-xs text-gray-500">UP Manila DRRM -H</span>
->>>>>>> Stashed changes
             </div>
           )}
         </Link>

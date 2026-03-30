@@ -35,14 +35,10 @@ export async function logActivity({
     const { error } = await supabase.from('activity_logs').insert({
       action,
       module,
-      doc_id: docId,
-      doc_name: docName,
-      initiated_by: userId,
-      initiated_by_email: userEmail,
-      initiated_by_display: initiatedByDisplay,
+      moduleitem: docName,
+      initiatedby: userId,
       data: serializableData,
-      status: 'success',
-      created_at: new Date().toISOString(),
+      datecreated: new Date().toISOString(),
     });
 
     if (error) throw error;

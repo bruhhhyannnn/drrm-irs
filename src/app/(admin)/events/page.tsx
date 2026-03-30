@@ -1,5 +1,5 @@
-=======
-'use client';
+﻿'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -17,29 +17,12 @@ import {
   X,
 } from 'lucide-react';
 import { useEvents } from '@/hooks/use-events';
+import type { Event as DatabaseEvent } from '@/types/database';
 import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
-=======
-import {
-  Search,
-  Eye,
-  CalendarDays,
-  List,
-  School,
-  Dumbbell,
-  CalendarCheck,
-  MapPin,
-  Clock,
-  ChevronDown,
-  X,
-} from 'lucide-react';
-import { useEvents } from '@/hooks/use-events';
-import { PageBreadcrumb } from '@/components/common/page-breadcrumb';
->>>>>>> Stashed changes
 
 // ─── Color helpers ───────────────────────────────────────────────────────────
 type Category = 'actual' | 'drill' | string;
 
-<<<<<<< Updated upstream
 function getCategoryColor(category: Category) {
   switch (category?.toLowerCase()) {
     case 'actual':
@@ -53,29 +36,34 @@ function getCategoryColor(category: Category) {
 
 function getCategoryIcon(category: Category) {
   switch (category?.toLowerCase()) {
-    case 'actual': return <School size={16} />;
-    case 'drill':    return <Dumbbell size={16} />;
-    default:         return <CalendarCheck size={16} />;
+    case 'actual':
+      return <School size={16} />;
+    case 'drill':
+      return <Dumbbell size={16} />;
+    default:
+      return <CalendarCheck size={16} />;
   }
 }
 
 function getStatusColor(status: string) {
   switch (status?.toLowerCase()) {
-    case 'active':    return { bg: 'bg-green-50',  text: 'text-green-700',  dot: 'bg-green-500' };
-    case 'completed': return { bg: 'bg-blue-50',   text: 'text-blue-700',   dot: 'bg-blue-500'  };
-    default:          return { bg: 'bg-amber-50',  text: 'text-amber-700',  dot: 'bg-amber-400' };
+    case 'active':
+      return { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500' };
+    case 'completed':
+      return { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' };
+    default:
+      return { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-400' };
   }
 }
 
 // ─── Filter options ───────────────────────────────────────────────────────────
 const FILTER_OPTIONS = [
-  { value: 'all',      label: 'All Events', icon: CalendarCheck, color: 'text-blue-600',  iconBg: 'bg-blue-50'  },
-  { value: 'actual', label: 'Actual',   icon: School,        color: 'text-teal-600',  iconBg: 'bg-teal-50'  },
-  { value: 'drill',    label: 'Drill',      icon: Dumbbell,      color: 'text-amber-600', iconBg: 'bg-amber-50' },
+  { value: 'all', label: 'All Events', icon: CalendarCheck, color: 'text-blue-600', iconBg: 'bg-blue-50' },
+  { value: 'actual', label: 'Actual', icon: School, color: 'text-teal-600', iconBg: 'bg-teal-50' },
+  { value: 'drill', label: 'Drill', icon: Dumbbell, color: 'text-amber-600', iconBg: 'bg-amber-50' },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
 function StatusBadge({ status }: { status: string }) {
   const s = getStatusColor(status);
   return (
@@ -97,139 +85,13 @@ function CategoryBadge({ category }: { category: string }) {
 }
 
 // ─── Event Card (list view) ───────────────────────────────────────────────────
-function EventCard({ event }: { event: any }) {
-  const c = getCategoryColor(event.category);
+function EventCard({ event }: { event: DatabaseEvent }) {
+  const c = getCategoryColor(event.category ?? '');
   const start = event.timestampstart ? new Date(event.timestampstart) : null;
-=======
-function getCategoryColor(category: Category) {
-  switch (category?.toLowerCase()) {
-    case 'actual':
-      return { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200', dot: 'bg-teal-500' };
-    case 'drill':
-      return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', dot: 'bg-amber-400' };
-    default:
-      return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500' };
-  }
-}
-
-function getCategoryIcon(category: Category) {
-  switch (category?.toLowerCase()) {
-    case 'actual': return <School size={16} />;
-    case 'drill':    return <Dumbbell size={16} />;
-    default:         return <CalendarCheck size={16} />;
-  }
-}
-
-function getStatusColor(status: string) {
-  switch (status?.toLowerCase()) {
-    case 'active':    return { bg: 'bg-green-50',  text: 'text-green-700',  dot: 'bg-green-500' };
-    case 'completed': return { bg: 'bg-blue-50',   text: 'text-blue-700',   dot: 'bg-blue-500'  };
-    default:          return { bg: 'bg-amber-50',  text: 'text-amber-700',  dot: 'bg-amber-400' };
-  }
-}
-
-// ─── Filter options ───────────────────────────────────────────────────────────
-const FILTER_OPTIONS = [
-  { value: 'all',      label: 'All Events', icon: CalendarCheck, color: 'text-blue-600',  iconBg: 'bg-blue-50'  },
-  { value: 'actual', label: 'Actual',   icon: School,        color: 'text-teal-600',  iconBg: 'bg-teal-50'  },
-  { value: 'drill',    label: 'Drill',      icon: Dumbbell,      color: 'text-amber-600', iconBg: 'bg-amber-50' },
-];
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: string }) {
-  const s = getStatusColor(status);
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${s.bg} ${s.text}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-      {status}
-    </span>
-  );
-}
-
-function CategoryBadge({ category }: { category: string }) {
-  const c = getCategoryColor(category);
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${c.bg} ${c.text} ${c.border}`}>
-      {getCategoryIcon(category)}
-      {category}
-    </span>
-  );
-}
-
-// ─── Event Card (list view) ───────────────────────────────────────────────────
-function EventCard({ event }: { event: any }) {
-  const c = getCategoryColor(event.category);
-  const start = event.timestampstart ? new Date(event.timestampstart) : null;
-
-  if (isLoading) return <Spinner center />;
-  if (error) return <PageError message={error.message} />;
-=======
-function getCategoryColor(category: Category) {
-  switch (category?.toLowerCase()) {
-    case 'actual':
-      return { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200', dot: 'bg-teal-500' };
-    case 'drill':
-      return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', dot: 'bg-amber-400' };
-    default:
-      return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500' };
-  }
-}
-
-function getCategoryIcon(category: Category) {
-  switch (category?.toLowerCase()) {
-    case 'actual': return <School size={16} />;
-    case 'drill':    return <Dumbbell size={16} />;
-    default:         return <CalendarCheck size={16} />;
-  }
-}
-
-function getStatusColor(status: string) {
-  switch (status?.toLowerCase()) {
-    case 'active':    return { bg: 'bg-green-50',  text: 'text-green-700',  dot: 'bg-green-500' };
-    case 'completed': return { bg: 'bg-blue-50',   text: 'text-blue-700',   dot: 'bg-blue-500'  };
-    default:          return { bg: 'bg-amber-50',  text: 'text-amber-700',  dot: 'bg-amber-400' };
-  }
-}
-
-// ─── Filter options ───────────────────────────────────────────────────────────
-const FILTER_OPTIONS = [
-  { value: 'all',      label: 'All Events', icon: CalendarCheck, color: 'text-blue-600',  iconBg: 'bg-blue-50'  },
-  { value: 'actual', label: 'Actual',   icon: School,        color: 'text-teal-600',  iconBg: 'bg-teal-50'  },
-  { value: 'drill',    label: 'Drill',      icon: Dumbbell,      color: 'text-amber-600', iconBg: 'bg-amber-50' },
-];
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: string }) {
-  const s = getStatusColor(status);
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${s.bg} ${s.text}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-      {status}
-    </span>
-  );
-}
-
-function CategoryBadge({ category }: { category: string }) {
-  const c = getCategoryColor(category);
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${c.bg} ${c.text} ${c.border}`}>
-      {getCategoryIcon(category)}
-      {category}
-    </span>
-  );
-}
-
-// ─── Event Card (list view) ───────────────────────────────────────────────────
-function EventCard({ event }: { event: any }) {
-  const c = getCategoryColor(event.category);
-  const start = event.timestampstart ? new Date(event.timestampstart) : null;
->>>>>>> Stashed changes
+  const end = event.timestampend ? new Date(event.timestampend) : null;
 
   return (
     <div className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:border-red-100 hover:shadow-md">
-      {/* Date badge */}
       <div className={`flex w-14 flex-shrink-0 flex-col items-center rounded-xl py-2.5 ${c.bg}`}>
         {start ? (
           <>
@@ -245,7 +107,6 @@ function EventCard({ event }: { event: any }) {
         )}
       </div>
 
-      {/* Details */}
       <div className="min-w-0 flex-1">
         <p className="truncate text-base font-bold text-gray-900">{event.eventname}</p>
         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -253,6 +114,7 @@ function EventCard({ event }: { event: any }) {
             <span className="flex items-center gap-1 text-xs text-gray-500">
               <Clock size={12} />
               {format(start, 'h:mm a')}
+              {end && ` - ${format(end, 'h:mm a')}`}
             </span>
           )}
           {event.location && (
@@ -261,77 +123,46 @@ function EventCard({ event }: { event: any }) {
               <span className="max-w-[160px] truncate">{event.location}</span>
             </span>
           )}
+          {event.eventdescription && (
+            <span className="text-xs text-gray-500 max-w-[200px] truncate" title={event.eventdescription}>
+              {event.eventdescription}
+            </span>
+          )}
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {event.incidentcommander && (
+            <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
+              IC: {event.incidentcommander}
+            </span>
+          )}
+          {event.liasonofficer && (
+            <span className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded">
+              LO: {event.liasonofficer}
+            </span>
+          )}
+          {event.publicinformationofficer && (
+            <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">
+              PIO: {event.publicinformationofficer}
+            </span>
+          )}
+          {event.safetysecurityofficer && (
+            <span className="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded">
+              SSO: {event.safetysecurityofficer}
+            </span>
+          )}
+          <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded ${
+            event.eventstarted ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'
+          }`}>
+            Started: {event.eventstarted ? 'Yes' : 'No'}
+          </span>
         </div>
       </div>
 
-<<<<<<< Updated upstream
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Date & Time</TableHead>
-            <TableHead>Event Name</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {events?.map((event) => (
-            <TableRow key={event.id}>
-              <TableCell>
-                {event.started_at ? format(new Date(event.started_at), 'MMM d, yyyy h:mm a') : '—'}
-              </TableCell>
-              <TableCell className="font-medium text-gray-900 dark:text-white">
-                {event.event_name}
-              </TableCell>
-              <TableCell>{event.category}</TableCell>
-              <TableCell>{event.location}</TableCell>
-              <TableCell>
-                <Badge
-                  color={
-                    event.status === 'active'
-                      ? 'success'
-                      : event.status === 'completed'
-                        ? 'primary'
-                        : 'warning'
-                  }
-                  size="sm"
-                >
-                  {event.status}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Link
-                  href={`/events/details?id=${event.id}`}
-                  className="text-brand-500 hover:text-brand-600 inline-flex items-center gap-1.5 text-sm"
-                >
-                  <Eye size={14} />
-                  View
-                </Link>
-              </TableCell>
-            </TableRow>
-          ))}
-          {!events?.length && (
-            <TableRow>
-              <TableCell className="py-10 text-center text-gray-400" colSpan={6}>
-                No events found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-=======
-      {/* Right column */}
       <div className="flex flex-shrink-0 flex-col items-end gap-2">
-        <CategoryBadge category={event.category} />
-        <StatusBadge status={event.status} />
+        <CategoryBadge category={event.category ?? 'Unknown'} />
+        <StatusBadge status={event.status ?? 'Unknown'} />
       </div>
 
-      {/* View link */}
       <Link
         href={`/events/details?id=${event.event_id}`}
         className="ml-1 flex-shrink-0 rounded-xl border border-red-100 bg-red-50 p-2.5 text-red-600 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-red-100"
@@ -344,14 +175,29 @@ function EventCard({ event }: { event: any }) {
 }
 
 // ─── Table view (wider screens) ───────────────────────────────────────────────
-function EventTable({ events }: { events: any[] }) {
+function EventTable({ events }: { events: DatabaseEvent[] }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-50">
-              {['Date & Time', 'Event Name', 'Category', 'Location', 'Status', ''].map((h) => (
+              {[
+                'Start Date & Time',
+                'End Date & Time',
+                'Event Name',
+                'Description',
+                'Category',
+                'Location',
+                'Status',
+                'Started',
+                'Incident Commander',
+                'Liaison Officer',
+                'Public Info Officer',
+                'Safety Officer',
+                'Created At',
+                ''
+              ].map((h) => (
                 <th
                   key={h}
                   className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -364,16 +210,26 @@ function EventTable({ events }: { events: any[] }) {
           <tbody className="divide-y divide-gray-50">
             {events.map((event) => {
               const start = event.timestampstart ? new Date(event.timestampstart) : null;
+              const end = event.timestampend ? new Date(event.timestampend) : null;
+              const created = event.created_at ? new Date(event.created_at) : null;
               return (
                 <tr key={event.event_id} className="group transition-colors hover:bg-red-50/40">
                   <td className="px-5 py-4 text-sm text-gray-600">
                     {start ? format(start, 'MMM d, yyyy h:mm a') : '—'}
                   </td>
+                  <td className="px-5 py-4 text-sm text-gray-600">
+                    {end ? format(end, 'MMM d, yyyy h:mm a') : '—'}
+                  </td>
                   <td className="px-5 py-4">
                     <span className="text-sm font-semibold text-gray-900">{event.eventname}</span>
                   </td>
                   <td className="px-5 py-4">
-                    <CategoryBadge category={event.category} />
+                    <span className="text-sm text-gray-600 max-w-[200px] truncate" title={event.eventdescription || ''}>
+                      {event.eventdescription || '—'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <CategoryBadge category={event.category ?? 'Unknown'} />
                   </td>
                   <td className="px-5 py-4">
                     <span className="flex items-center gap-1 text-sm text-gray-600">
@@ -382,7 +238,34 @@ function EventTable({ events }: { events: any[] }) {
                     </span>
                   </td>
                   <td className="px-5 py-4">
-                    <StatusBadge status={event.status} />
+                    <StatusBadge status={event.status ?? 'Unknown'} />
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      event.eventstarted
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-gray-50 text-gray-600'
+                    }`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${
+                        event.eventstarted ? 'bg-green-500' : 'bg-gray-400'
+                      }`} />
+                      {event.eventstarted ? 'Yes' : 'No'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-sm text-gray-600">{event.incidentcommander || '—'}</span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-sm text-gray-600">{event.liasonofficer || '—'}</span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-sm text-gray-600">{event.publicinformationofficer || '—'}</span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-sm text-gray-600">{event.safetysecurityofficer || '—'}</span>
+                  </td>
+                  <td className="px-5 py-4 text-sm text-gray-600">
+                    {created ? format(created, 'MMM d, yyyy h:mm a') : '—'}
                   </td>
                   <td className="px-5 py-4">
                     <Link
@@ -398,7 +281,7 @@ function EventTable({ events }: { events: any[] }) {
             })}
             {!events.length && (
               <tr>
-                <td colSpan={6} className="py-16 text-center">
+                <td colSpan={14} className="py-16 text-center">
                   <EmptyState message="No events found" />
                 </td>
               </tr>
@@ -465,9 +348,7 @@ function FilterDropdown({
         <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${selected.iconBg}`}>
           <Icon size={17} className={selected.color} />
         </span>
-        <span className="flex-1 text-left text-sm font-medium text-gray-800">
-          {selected.label}
-        </span>
+        <span className="flex-1 text-left text-sm font-medium text-gray-800">{selected.label}</span>
         <ChevronDown
           size={18}
           className={`text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
@@ -484,15 +365,16 @@ function FilterDropdown({
               return (
                 <button
                   key={opt.value}
-                  onClick={() => { onChange(opt.value); setOpen(false); }}
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
                   className={`flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-gray-50 ${active ? 'bg-red-50' : ''}`}
                 >
                   <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${opt.iconBg}`}>
                     <OptIcon size={16} className={opt.color} />
                   </span>
-                  <span className={`font-medium ${active ? 'text-red-600' : 'text-gray-700'}`}>
-                    {opt.label}
-                  </span>
+                  <span className={`font-medium ${active ? 'text-red-600' : 'text-gray-700'}`}>{opt.label}</span>
                 </button>
               );
             })}
@@ -521,9 +403,7 @@ function ViewToggle({
           key={id}
           onClick={() => onChange(id)}
           className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-200 ${
-            view === id
-              ? 'bg-red-600 text-white shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+            view === id ? 'bg-red-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
           }`}
         >
           <Icon size={15} />
@@ -536,39 +416,32 @@ function ViewToggle({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function EventsPage() {
-  const [query, setQuery]         = useState('');
-  const [filter, setFilter]       = useState('all');
-  const [view, setView]           = useState<'cards' | 'table'>('cards');
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [view, setView] = useState<'cards' | 'table'>('cards');
   const [showSearch, setShowSearch] = useState(false);
 
   const { data: rawEvents, isLoading, error } = useEvents(query);
 
   if (isLoading) return <LoadingSpinner />;
-  if (error)     return <ErrorMessage message={error.message} />;
+  if (error) return <ErrorMessage message={error.message} />;
 
-  // Apply category filter (same logic as mobile)
-  const events = (rawEvents ?? []).filter((e: any) => {
+  const events = (rawEvents ?? []).filter((e: DatabaseEvent) => {
     if (filter !== 'all' && e.category?.toLowerCase() !== filter) return false;
     return true;
   });
 
   return (
     <div className="space-y-5">
-      {/* Breadcrumb */}
       <PageBreadcrumb pageTitle="Events" />
 
-      {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        {/* Filter dropdown */}
         <FilterDropdown value={filter} onChange={setFilter} />
 
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* View toggle */}
         <ViewToggle view={view} onChange={setView} />
 
-        {/* Search */}
         <div className="relative">
           <button
             onClick={() => setShowSearch((p) => !p)}
@@ -579,15 +452,14 @@ export default function EventsPage() {
             }`}
           >
             <Search size={15} />
-            {query ? (
-              <span className="max-w-[120px] truncate">{query}</span>
-            ) : (
-              'Search'
-            )}
+            {query ? <span className="max-w-[120px] truncate">{query}</span> : 'Search'}
             {query && (
               <X
                 size={13}
-                onClick={(e) => { e.stopPropagation(); setQuery(''); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setQuery('');
+                }}
                 className="cursor-pointer text-red-400 hover:text-red-600"
               />
             )}
@@ -616,7 +488,7 @@ export default function EventsPage() {
                   <button
                     className="rounded-xl bg-red-600 px-4 text-sm font-bold text-white transition-colors hover:bg-red-700"
                     onClick={(e) => {
-                      const input = (e.currentTarget.parentElement!.querySelector('input') as HTMLInputElement);
+                      const input = e.currentTarget.parentElement!.querySelector('input') as HTMLInputElement;
                       setQuery(input.value.trim());
                       setShowSearch(false);
                     }}
@@ -630,7 +502,6 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Active filter chip */}
       {filter !== 'all' && (
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500">Filtered by:</span>
@@ -644,7 +515,6 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* Content */}
       {events.length === 0 ? (
         <div className="rounded-2xl border border-gray-100 bg-white py-16 shadow-sm">
           <EmptyState
@@ -654,7 +524,7 @@ export default function EventsPage() {
         </div>
       ) : view === 'cards' ? (
         <div className="space-y-3">
-          {events.map((event: any) => (
+          {events.map((event) => (
             <EventCard key={event.event_id} event={event} />
           ))}
         </div>
@@ -664,4 +534,3 @@ export default function EventsPage() {
     </div>
   );
 }
->>>>>>> Stashed changes

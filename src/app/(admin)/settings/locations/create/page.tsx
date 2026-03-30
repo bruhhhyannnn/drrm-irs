@@ -5,7 +5,7 @@ export default function CreatePage() {
       title="Locations"
       table="locations"
       module="Locations"
-      nameKey="locationName"
+      nameKey="location_name"
       basePath="/settings/locations"
     />
   );

@@ -5,7 +5,7 @@ export default function CreatePage() {
       title="Remarks"
       table="remarks"
       module="Remarks"
-      nameKey="remarkName"
+      nameKey="remark_name"
       basePath="/settings/remarks"
     />
   );

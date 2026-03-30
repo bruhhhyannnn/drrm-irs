@@ -5,7 +5,7 @@ export default function EditPage({ params }: { params: { id: string } }) {
       title="Remarks"
       table="remarks"
       module="Remarks"
-      nameKey="remarkName"
+      nameKey="remark_name"
       basePath="/settings/remarks"
       editId={params.id}
     />

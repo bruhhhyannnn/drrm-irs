@@ -3,9 +3,9 @@ export default function Page() {
   return (
     <SettingsTablePage
       title="Event Actions"
-      table="event-actions"
+      table="event_actions"
       module="Event Actions"
-      nameKey="actionName"
+      nameKey="action_name"
       basePath="/settings/event-actions"
     />
   );

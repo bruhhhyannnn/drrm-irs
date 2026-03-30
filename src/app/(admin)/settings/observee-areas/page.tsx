@@ -3,9 +3,9 @@ export default function Page() {
   return (
     <SettingsTablePage
       title="Observee Areas"
-      table="observee-areas"
+      table="observee_areas"
       module="Observee Areas"
-      nameKey="areaName"
+      nameKey="area_name"
       basePath="/settings/observee-areas"
     />
   );

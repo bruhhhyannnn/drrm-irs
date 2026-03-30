@@ -30,21 +30,6 @@ const USER_TYPE_LABELS: Record<number, string> = {
 export default function UsersPage() {
   const [query, setQuery] = useState('');
   const { data: users, isLoading } = useUsers(query);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  const handleToggleStatus = async (id: string, current: boolean) => {
-    if (!confirm(`${current ? 'Deactivate' : 'Activate'} this user?`)) return;
-    setTogglingId(id);
-    const { error } = await supabase.from('users').update({ isActive: !current }).eq('id', id);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success(`User ${current ? 'deactivated' : 'activated'}`);
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    }
-    setTogglingId(null);
-  };
 
   return (
     <div className="space-y-6">
@@ -68,52 +53,60 @@ export default function UsersPage() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
+            <TableHead>First Name</TableHead>
+            <TableHead>Middle Name</TableHead>
+            <TableHead>Last Name</TableHead>
+            <TableHead>Suffix</TableHead>
             <TableHead>Username</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Auth ID</TableHead>
             <TableHead>Cluster</TableHead>
-            <TableHead>Position</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Office</TableHead>
+            <TableHead>Building Name</TableHead>
+            <TableHead>Encoder Position</TableHead>
+            <TableHead>User Type</TableHead>
+            <TableHead>Created At</TableHead>
+            <TableHead>Encoder ID</TableHead>
+            <TableHead>Zone</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell className="py-10 text-center" colSpan={8}>
+              <TableCell className="py-10 text-center" colSpan={16}>
                 <Spinner center />
               </TableCell>
             </TableRow>
           ) : (
             users?.map((user) => (
-              <TableRow key={user.id}>
+              <TableRow key={user.encoder_id}>
                 <TableCell className="font-medium text-gray-900 dark:text-white">
-                  {[user.firstname, user.middlename, user.lastname].filter(Boolean).join(' ')}
+                  {user.firstname}
                 </TableCell>
+                <TableCell>{user.middlename || '-'}</TableCell>
+                <TableCell>{user.lastname}</TableCell>
+                <TableCell>{user.suffix || '-'}</TableCell>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.cluster}</TableCell>
-                <TableCell>{user.encoder_position}</TableCell>
+                <TableCell className="font-mono text-sm">{user.authid}</TableCell>
+                <TableCell>{user.cluster || '-'}</TableCell>
+                <TableCell>{user.office || '-'}</TableCell>
+                <TableCell>{user.bldgname || '-'}</TableCell>
+                <TableCell>{user.encoder_position || '-'}</TableCell>
                 <TableCell>
                   <Badge color="primary" size="sm">
                     {USER_TYPE_LABELS[user.usertype] ?? `Type ${user.usertype}`}
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  <button
-                    onClick={() => handleToggleStatus(user.id, user.is_active ?? true)}
-                    disabled={togglingId === user.id}
-                    className="cursor-pointer"
-                  >
-                    <Badge color={user.is_active ? 'success' : 'error'} size="sm">
-                      {user.is_active ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </button>
+                <TableCell className="text-sm">
+                  {new Date(user.created_at).toLocaleDateString()}
                 </TableCell>
+                <TableCell className="font-mono text-sm">{user.encoder_id}</TableCell>
+                <TableCell>{user.zone || '-'}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Link href={`/users/edit/${user.id}`}>
+                    <Link href={`/users/edit/${user.encoder_id}`}>
                       <button className="hover:text-brand-500 text-gray-400">
                         <Pencil size={15} />
                       </button>
@@ -125,7 +118,7 @@ export default function UsersPage() {
           )}
           {!isLoading && !users?.length && (
             <TableRow>
-              <TableCell className="py-10 text-center text-gray-400" colSpan={8}>
+              <TableCell className="py-10 text-center text-gray-400" colSpan={16}>
                 No users found
               </TableCell>
             </TableRow>

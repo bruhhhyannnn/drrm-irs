@@ -33,7 +33,6 @@ export const userSchema = z.object({
   encoder_position: z.string().min(1, 'Position is required'),
   usertype: z.coerce.number().min(1, 'User type is required'),
   zone: z.string().optional(),
-  isActive: z.boolean().default(true),
 });
 
 /* ─── Building ─── */

@@ -3,7 +3,7 @@ export default function CreatePage() {
   return (
     <SettingsForm
       title="Buildings & Zones"
-      table="buildings-zones"
+      table="buildings"
       module="Buildings"
       nameKey="buildingName"
       basePath="/settings/buildings"

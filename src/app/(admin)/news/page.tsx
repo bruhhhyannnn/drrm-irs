@@ -54,27 +54,35 @@ export default function NewsPage() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>ID</TableHead>
             <TableHead>Title</TableHead>
+            <TableHead>Content</TableHead>
             <TableHead>Author</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Published</TableHead>
+            <TableHead>Published At</TableHead>
+            <TableHead>Created At</TableHead>
+            <TableHead>Updated At</TableHead>
+            <TableHead>Image URL</TableHead>
+            <TableHead>Source URL</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell className="py-10 text-center" colSpan={6}>
+              <TableCell className="py-10 text-center" colSpan={12}>
                 <Spinner center />
               </TableCell>
             </TableRow>
           ) : (
             data?.data.map((item) => (
               <TableRow key={item.id}>
+                <TableCell className="font-mono text-sm">{item.id}</TableCell>
                 <TableCell className="max-w-75 truncate font-medium text-gray-900 dark:text-white">
                   {item.title}
                 </TableCell>
+                <TableCell className="max-w-100 truncate">{item.content}</TableCell>
                 <TableCell>{item.author}</TableCell>
                 <TableCell>{item.category}</TableCell>
                 <TableCell>
@@ -85,6 +93,14 @@ export default function NewsPage() {
                 <TableCell>
                   {item.published_at ? format(new Date(item.published_at), 'MMM d, yyyy') : '—'}
                 </TableCell>
+                <TableCell>
+                  {item.created_at ? format(new Date(item.created_at), 'MMM d, yyyy') : '—'}
+                </TableCell>
+                <TableCell>
+                  {item.updated_at ? format(new Date(item.updated_at), 'MMM d, yyyy') : '—'}
+                </TableCell>
+                <TableCell className="max-w-100 truncate">{item.image_url || '—'}</TableCell>
+                <TableCell className="max-w-100 truncate">{item.source_url || '—'}</TableCell>
                 <TableCell>
                   <Link href={`/news/edit/${item.id}`}>
                     <button className="hover:text-brand-500 text-gray-400">
@@ -97,7 +113,7 @@ export default function NewsPage() {
           )}
           {!isLoading && !data?.data.length && (
             <TableRow>
-              <TableCell className="py-10 text-center text-gray-400" colSpan={6}>
+              <TableCell className="py-10 text-center text-gray-400" colSpan={12}>
                 No news found
               </TableCell>
             </TableRow>

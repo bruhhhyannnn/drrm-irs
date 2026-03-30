@@ -35,7 +35,7 @@ export function useUser(id?: string) {
   return useQuery({
     queryKey: ['user', id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
+      const { data, error } = await supabase.from('users').select('*').eq('encoder_id', id).single();
       if (error) throw error;
       return data as User;
     },
@@ -54,12 +54,12 @@ async function fetchActivityLogs(page: number, query?: string): Promise<Activity
 
   if (query) {
     builder = builder.or(
-      `module.ilike.%${query}%,action.ilike.%${query}%,doc_name.ilike.%${query}%`
+      `module.ilike.%${query}%,action.ilike.%${query}%,moduleitem.ilike.%${query}%`
     );
   }
 
   const from = (page - 1) * PER_PAGE;
-  builder = builder.order('created_at', { ascending: false }).range(from, from + PER_PAGE - 1);
+  builder = builder.order('datecreated', { ascending: false }).range(from, from + PER_PAGE - 1);
 
   const { data, error, count } = await builder;
   if (error) throw error;

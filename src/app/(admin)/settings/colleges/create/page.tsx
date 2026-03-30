@@ -3,9 +3,9 @@ export default function CreatePage() {
   return (
     <SettingsForm
       title="Colleges & Units"
-      table="colleges-units"
+      table="college_units"
       module="Colleges"
-      nameKey="collegeName"
+      nameKey="name"
       basePath="/settings/colleges"
     />
   );

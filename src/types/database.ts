@@ -1,43 +1,36 @@
 export interface User {
-  id: string;
-  authid: string;
+  encoder_id: string;
   username: string;
   firstname: string;
   middlename?: string;
   lastname: string;
   suffix?: string;
   email: string;
+  authid: string;
   cluster?: string;
   office?: string;
-  college_unit?: string;
   bldgname?: string;
   encoder_position?: string;
-  role_specify?: string;
   usertype: number;
-  zone?: string;
-  is_active: boolean;
   created_at: string;
-  updated_at: string;
+  zone?: string;
 }
 
 export interface Event {
-  id: string;
-  event_name: string;
-  event_description?: string;
+  event_id: string;
+  timestampstart: string;
+  timestampend?: string;
   category?: string;
-  quarter?: string;
+  eventname: string;
+  eventdescription?: string;
+  eventstarted: boolean;
+  incidentcommander?: string;
+  liasonofficer?: string;
   status: string;
-  event_started: boolean;
   location?: string;
-  incident_commander?: string;
-  liaison_officer?: string;
-  safety_security_officer?: string;
-  public_information_officer?: string;
-  started_at?: string;
-  ended_at?: string;
-  created_by?: string;
+  publicinformationofficer?: string;
+  safetysecurityofficer?: string;
   created_at: string;
-  updated_at: string;
 }
 
 export interface ReportAssignment {
@@ -54,19 +47,45 @@ export interface Report {
   id: string;
   event_id: string;
   encoder_id?: string;
-  encoder_name?: string;
   encoder_position?: string;
-  role_specify?: string;
-  cluster: string;
+  report_id?: string;
   office?: string;
-  college_unit?: string;
-  bldgname?: string;
-  exact_location?: string;
-  gps_location?: string;
+  cluster?: string;
+  bldg_name?: string;
+  exactlocation?: string;
+  created_at: string;
+  last_modified?: string;
   event_type?: string;
   hazard_type?: string;
+  facultymembers: number;
+  adminmembers: number;
+  repsmembers: number;
+  ramembers: number;
+  students: number;
+  philcarestaff: number;
+  securitypersonnel: number;
+  constructionworkers: number;
+  tenants: number;
+  healthworkers: number;
+  nonacademicstaff: number;
+  guests: number;
+  nummissingpersons: number;
+  numcasualties: number;
+  namesofmissingpersons?: string;
+  identityandconditionofcasualties?: string;
+  damageassessment?: string;
+  eventname?: string;
+}
 
-  // Headcount
+export interface EventTotal {
+  id: string;
+  event_id: string;
+  created_at: string;
+  last_modified?: string;
+  cluster?: string;
+  reports_id: string[];
+  event_type?: string;
+  hazard_type?: string;
   faculty_members: number;
   admin_members: number;
   reps_members: number;
@@ -79,18 +98,12 @@ export interface Report {
   health_workers: number;
   non_academic_staff: number;
   guests: number;
-
-  // Incident
-  missing_count: number;
-  missing_names?: string;
-  casualties_count: number;
-  casualties_detail?: string;
-  damage_report?: string;
-
-  external_item_id?: string;
-  submitted_at: string;
-  created_at: string;
-  updated_at: string;
+  num_missing_persons: number;
+  num_casualties: number;
+  exactlocation?: string;
+  namesofmissingpersons?: string;
+  identityandconditionofcasualties?: string;
+  eventname?: string;
 }
 
 export interface Checklist {
@@ -119,16 +132,12 @@ export interface News {
 
 export interface ActivityLog {
   id: string;
-  initiated_by?: string;
-  action: string;
+  datecreated: string;
   module: string;
-  doc_id?: string;
-  doc_name?: string;
-  initiated_by_email?: string;
-  initiated_by_display?: string;
-  data?: Record<string, unknown>;
-  status: string;
-  created_at: string;
+  moduleitem?: string;
+  initiatedby?: string;
+  action: string;
+  data?: any;
 }
 
 // ─── Settings / lookup tables ─────────────────────────────

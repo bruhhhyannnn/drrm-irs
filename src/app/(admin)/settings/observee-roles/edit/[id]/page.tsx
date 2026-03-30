@@ -3,9 +3,9 @@ export default function EditPage({ params }: { params: { id: string } }) {
   return (
     <SettingsForm
       title="Observee Roles"
-      table="observee-roles"
+      table="observee_roles"
       module="Observee Roles"
-      nameKey="roleName"
+      nameKey="role_name"
       basePath="/settings/observee-roles"
       editId={params.id}
     />

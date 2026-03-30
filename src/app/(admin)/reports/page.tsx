@@ -29,16 +29,16 @@ export default function ReportsPage() {
 
   const totalAffected = (r: Report) =>
     (r.students ?? 0) +
-    (r.faculty_members ?? 0) +
-    (r.admin_members ?? 0) +
-    (r.reps_members ?? 0) +
-    (r.ra_members ?? 0) +
-    (r.philcare_staff ?? 0) +
-    (r.security_personnel ?? 0) +
-    (r.construction_workers ?? 0) +
+    (r.facultymembers ?? 0) +
+    (r.adminmembers ?? 0) +
+    (r.repsmembers ?? 0) +
+    (r.ramembers ?? 0) +
+    (r.philcarestaff ?? 0) +
+    (r.securitypersonnel ?? 0) +
+    (r.constructionworkers ?? 0) +
     (r.tenants ?? 0) +
-    (r.health_workers ?? 0) +
-    (r.non_academic_staff ?? 0) +
+    (r.healthworkers ?? 0) +
+    (r.nonacademicstaff ?? 0) +
     (r.guests ?? 0);
 
   if (isLoading) return <Spinner center />;
@@ -72,18 +72,38 @@ export default function ReportsPage() {
             <TableHead>Event Name</TableHead>
             <TableHead>Cluster</TableHead>
             <TableHead>Office</TableHead>
+            <TableHead>Building</TableHead>
             <TableHead>Location</TableHead>
+            <TableHead>Encoder Position</TableHead>
+            <TableHead>Event Type</TableHead>
+            <TableHead>Hazard Type</TableHead>
+            <TableHead>Faculty</TableHead>
+            <TableHead>Admin</TableHead>
+            <TableHead>Reps</TableHead>
+            <TableHead>RA</TableHead>
+            <TableHead>Students</TableHead>
+            <TableHead>PhilCare</TableHead>
+            <TableHead>Security</TableHead>
+            <TableHead>Construction</TableHead>
+            <TableHead>Tenants</TableHead>
+            <TableHead>Health</TableHead>
+            <TableHead>Non-Academic</TableHead>
+            <TableHead>Guests</TableHead>
             <TableHead>Total Affected</TableHead>
             <TableHead>Casualties</TableHead>
             <TableHead>Missing</TableHead>
-            <TableHead>Date</TableHead>
+            <TableHead>Missing Names</TableHead>
+            <TableHead>Casualty Details</TableHead>
+            <TableHead>Damage Assessment</TableHead>
+            <TableHead>Created At</TableHead>
+            <TableHead>Last Modified</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data?.data.map((report) => (
             <TableRow key={report.id}>
               <TableCell className="font-medium text-gray-900 dark:text-white">
-                {report.event_id}
+                {report.eventname}
               </TableCell>
               <TableCell>
                 <Badge color="primary" size="sm">
@@ -91,36 +111,58 @@ export default function ReportsPage() {
                 </Badge>
               </TableCell>
               <TableCell>{report.office}</TableCell>
+              <TableCell>{report.bldg_name}</TableCell>
               <TableCell className="max-w-50 truncate">
-                {report.exact_location || report.bldgname}
+                {report.exactlocation}
               </TableCell>
+              <TableCell>{report.encoder_position}</TableCell>
+              <TableCell>{report.event_type}</TableCell>
+              <TableCell>{report.hazard_type}</TableCell>
+              <TableCell>{report.facultymembers ?? 0}</TableCell>
+              <TableCell>{report.adminmembers ?? 0}</TableCell>
+              <TableCell>{report.repsmembers ?? 0}</TableCell>
+              <TableCell>{report.ramembers ?? 0}</TableCell>
+              <TableCell>{report.students ?? 0}</TableCell>
+              <TableCell>{report.philcarestaff ?? 0}</TableCell>
+              <TableCell>{report.securitypersonnel ?? 0}</TableCell>
+              <TableCell>{report.constructionworkers ?? 0}</TableCell>
+              <TableCell>{report.tenants ?? 0}</TableCell>
+              <TableCell>{report.healthworkers ?? 0}</TableCell>
+              <TableCell>{report.nonacademicstaff ?? 0}</TableCell>
+              <TableCell>{report.guests ?? 0}</TableCell>
               <TableCell className="font-medium">{totalAffected(report)}</TableCell>
               <TableCell>
-                {report.casualties_count > 0 ? (
+                {report.numcasualties > 0 ? (
                   <Badge color="error" size="sm">
-                    {report.casualties_count}
+                    {report.numcasualties}
                   </Badge>
                 ) : (
                   <span className="text-gray-400">0</span>
                 )}
               </TableCell>
               <TableCell>
-                {report.missing_count > 0 ? (
+                {report.nummissingpersons > 0 ? (
                   <Badge color="warning" size="sm">
-                    {report.missing_count}
+                    {report.nummissingpersons}
                   </Badge>
                 ) : (
                   <span className="text-gray-400">0</span>
                 )}
               </TableCell>
+              <TableCell className="max-w-50 truncate">{report.namesofmissingpersons}</TableCell>
+              <TableCell className="max-w-50 truncate">{report.identityandconditionofcasualties}</TableCell>
+              <TableCell className="max-w-50 truncate">{report.damageassessment}</TableCell>
               <TableCell>
                 {report.created_at ? format(new Date(report.created_at), 'MMM d, yyyy') : '—'}
+              </TableCell>
+              <TableCell>
+                {report.last_modified ? format(new Date(report.last_modified), 'MMM d, yyyy') : '—'}
               </TableCell>
             </TableRow>
           ))}
           {!data?.data.length && (
             <TableRow>
-              <TableCell className="py-10 text-center text-gray-400" colSpan={8}>
+              <TableCell className="py-10 text-center text-gray-400" colSpan={28}>
                 No reports found
               </TableCell>
             </TableRow>

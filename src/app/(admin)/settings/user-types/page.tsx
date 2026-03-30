@@ -3,9 +3,9 @@ export default function Page() {
   return (
     <SettingsTablePage
       title="User Types"
-      table="user-types"
+      table="user_types"
       module="User Types"
-      nameKey="typeName"
+      nameKey="type_name"
       basePath="/settings/user-types"
     />
   );

@@ -3,9 +3,9 @@ export default function EditPage({ params }: { params: { id: string } }) {
   return (
     <SettingsForm
       title="Event Actions"
-      table="event-actions"
+      table="event_actions"
       module="Event Actions"
-      nameKey="actionName"
+      nameKey="action_name"
       basePath="/settings/event-actions"
       editId={params.id}
     />

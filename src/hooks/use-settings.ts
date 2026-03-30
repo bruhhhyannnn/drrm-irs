@@ -11,7 +11,8 @@ export type SettingsTable =
   | 'college_units'
   | 'observee_areas'
   | 'observee_roles'
-  | 'remarks';
+  | 'remarks'
+  | 'buildings';
 
 // Maps each table to its display name column
 export const NAME_KEY_MAP: Record<SettingsTable, string> = {
@@ -23,6 +24,7 @@ export const NAME_KEY_MAP: Record<SettingsTable, string> = {
   observee_areas: 'area_name',
   observee_roles: 'role_name',
   remarks: 'remark_name',
+  buildings: 'buildingName',
 };
 
 /* ─── Fetch all rows from a settings table ──────────────── */

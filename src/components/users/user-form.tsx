@@ -28,7 +28,7 @@ export function UserForm({ editId }: UserFormProps) {
   const { data: existingUser } = useQuery({
     queryKey: ['user', editId],
     queryFn: async () => {
-      const { data, error } = await supabase.from('users').select('*').eq('id', editId).single();
+      const { data, error } = await supabase.from('users').select('*').eq('encoder_id', editId).single();
       if (error) throw error;
       return data;
     },
@@ -44,7 +44,7 @@ export function UserForm({ editId }: UserFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
-    defaultValues: { isActive: true, usertype: 2 },
+    defaultValues: { usertype: 2 },
   });
 
   useEffect(() => {
@@ -62,7 +62,6 @@ export function UserForm({ editId }: UserFormProps) {
         encoder_position: existingUser.encoder_position ?? '',
         usertype: existingUser.usertype ?? 2,
         zone: existingUser.zone ?? '',
-        isActive: existingUser.isActive ?? true,
       });
     }
   }, [existingUser, reset]);
@@ -70,11 +69,11 @@ export function UserForm({ editId }: UserFormProps) {
   const mutation = useMutation({
     mutationFn: async (data: UserFormData) => {
       if (isEdit) {
-        const { error } = await supabase.from('users').update(data).eq('id', editId);
+        const { error } = await supabase.from('users').update(data).eq('encoder_id', editId);
         if (error) throw error;
         await logActivity({
           action: 'update',
-          docID: editId!,
+          docId: editId!,
           docName: data.lastname,
           module: 'Users',
           data,
@@ -88,7 +87,7 @@ export function UserForm({ editId }: UserFormProps) {
         if (error) throw error;
         await logActivity({
           action: 'create',
-          docID: created.id,
+          docId: created.encoder_id,
           docName: data.lastname,
           module: 'Users',
           data,
@@ -196,18 +195,6 @@ export function UserForm({ editId }: UserFormProps) {
               <Label>Zone</Label>
               <Input {...register('zone')} />
             </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="isActive"
-              {...register('isActive')}
-              className="h-4 w-4 rounded border-gray-300"
-            />
-            <Label htmlFor="isActive" className="mb-0">
-              Active
-            </Label>
           </div>
 
           <div className="flex items-center gap-3 pt-2">

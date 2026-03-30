@@ -14,7 +14,7 @@ async function fetchReports(page: number, query?: string): Promise<ReportsResult
 
   if (query) {
     builder = builder.or(
-      `cluster.ilike.%${query}%,college_unit.ilike.%${query}%,encoder_name.ilike.%${query}%`
+      `cluster.ilike.%${query}%,office.ilike.%${query}%,encoder_position.ilike.%${query}%`
     );
   }
 
@@ -41,7 +41,7 @@ export function useEventReports(eventId?: string) {
         .from('reports')
         .select('*')
         .eq('event_id', eventId)
-        .order('submitted_at', { ascending: true });
+        .order('created_at', { ascending: true });
       if (error) throw error;
       return data as Report[];
     },
@@ -51,17 +51,17 @@ export function useEventReports(eventId?: string) {
 
 export function useTotalAffected(report: Report): number {
   return (
-    (report.faculty_members ?? 0) +
-    (report.admin_members ?? 0) +
-    (report.reps_members ?? 0) +
-    (report.ra_members ?? 0) +
+    (report.facultymembers ?? 0) +
+    (report.adminmembers ?? 0) +
+    (report.repsmembers ?? 0) +
+    (report.ramembers ?? 0) +
     (report.students ?? 0) +
-    (report.philcare_staff ?? 0) +
-    (report.security_personnel ?? 0) +
-    (report.construction_workers ?? 0) +
+    (report.philcarestaff ?? 0) +
+    (report.securitypersonnel ?? 0) +
+    (report.constructionworkers ?? 0) +
     (report.tenants ?? 0) +
-    (report.health_workers ?? 0) +
-    (report.non_academic_staff ?? 0) +
+    (report.healthworkers ?? 0) +
+    (report.nonacademicstaff ?? 0) +
     (report.guests ?? 0)
   );
 }

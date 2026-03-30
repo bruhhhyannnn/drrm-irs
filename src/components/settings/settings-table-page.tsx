@@ -20,14 +20,14 @@ import {
 } from '@/components/ui';
 
 type SettingsTable =
-  | 'event-scenarios'
-  | 'event-actions'
+  | 'event_scenarios'
+  | 'event_actions'
   | 'locations'
-  | 'user-types'
-  | 'colleges-units'
-  | 'buildings-zones'
-  | 'observee-areas'
-  | 'observee-roles'
+  | 'user_types'
+  | 'college_units'
+  | 'buildings'
+  | 'observee_areas'
+  | 'observee_roles'
   | 'remarks';
 
 interface SettingsPageProps {

@@ -10,7 +10,7 @@ async function fetchEvents(query?: string): Promise<Event[]> {
     .limit(100);
 
   if (query) {
-    builder = builder.ilike('event_name', `%${query}%`);
+    builder = builder.ilike('eventname', `%${query}%`);
   }
 
   const { data, error } = await builder;
@@ -29,7 +29,7 @@ export function useEvent(id?: string) {
   return useQuery({
     queryKey: ['event', id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('events').select('*').eq('id', id).single();
+      const { data, error } = await supabase.from('events').select('*').eq('event_id', id).single();
       if (error) throw error;
       return data as Event;
     },
