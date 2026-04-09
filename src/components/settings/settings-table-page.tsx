@@ -6,53 +6,82 @@ import { format } from 'date-fns';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { useSettingsTable, useDeleteSetting } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  Badge,
-  Button,
-  Input,
-  Spinner,
-} from '@/components/ui';
-
-type SettingsTable =
-  | 'event-scenarios'
-  | 'event-actions'
-  | 'locations'
-  | 'user-types'
-  | 'colleges-units'
-  | 'buildings-zones'
-  | 'observee-areas'
-  | 'observee-roles'
-  | 'remarks';
+import type { SettingsTable } from '@/actions';
+import { toSettingsPath } from '@/lib';
+import type { ColumnDef } from '@tanstack/react-table';
+import { DataTable, Badge, Button, Input } from '@/components/ui';
 
 interface SettingsPageProps {
   title: string;
   table: SettingsTable;
-  module: string;
-  nameKey: string;
-  basePath: string;
 }
 
-export function SettingsTablePage({ title, table, module, nameKey, basePath }: SettingsPageProps) {
+type SettingItem = {
+  id: string;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+};
+
+export function SettingsTablePage({ title, table }: SettingsPageProps) {
   const [query, setQuery] = useState('');
   const { data: items, isLoading } = useSettingsTable(table);
-  const deleteMutation = useDeleteSetting(table, module);
+  const deleteMutation = useDeleteSetting(table);
 
-  const filtered = items?.filter((item: Record<string, unknown>) =>
-    String(item[nameKey] ?? '')
-      .toLowerCase()
-      .includes(query.toLowerCase())
-  );
+  const basePath = toSettingsPath(title);
 
   const handleDelete = (id: string, name: string) => {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
     deleteMutation.mutate(id);
   };
+
+  const columns: ColumnDef<SettingItem, unknown>[] = [
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      cell: ({ getValue }) => (
+        <span className="font-medium text-gray-900 dark:text-white">
+          {String(getValue() ?? '—')}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'is_active',
+      header: 'Status',
+      cell: ({ row: { original: item } }) => (
+        <Badge color={item.is_active ? 'success' : 'error'} size="sm">
+          {item.is_active ? 'Active' : 'Inactive'}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: 'created_at',
+      header: 'Created',
+      cell: ({ row: { original: item } }) =>
+        item.created_at ? format(new Date(item.created_at), 'MMM d, yyyy') : '—',
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row: { original: item } }) => (
+        <div className="flex items-center gap-3">
+          <Link href={`${basePath}/edit/${item.id}`}>
+            <button className="hover:text-brand-500 text-gray-400">
+              <Pencil size={15} />
+            </button>
+          </Link>
+          <button
+            onClick={() => handleDelete(item.id, item.name)}
+            className="hover:text-error-500 text-gray-400"
+            disabled={deleteMutation.isPending}
+          >
+            <Trash2 size={15} />
+          </button>
+        </div>
+      ),
+      enableSorting: false,
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -73,64 +102,13 @@ export function SettingsTablePage({ title, table, module, nameKey, basePath }: S
         </Link>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell className="py-10 text-center" colSpan={4}>
-                <Spinner center />
-              </TableCell>
-            </TableRow>
-          ) : (
-            filtered?.map((item: Record<string, unknown>) => (
-              <TableRow key={String(item.id)}>
-                <TableCell className="font-medium text-gray-900 dark:text-white">
-                  {String(item[nameKey] ?? '—')}
-                </TableCell>
-                <TableCell>
-                  <Badge color={item.isActive ? 'success' : 'error'} size="sm">
-                    {item.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {item.created_at ? format(new Date(String(item.created_at)), 'MMM d, yyyy') : '—'}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Link href={`${basePath}/edit/${String(item.id)}`}>
-                      <button className="hover:text-brand-500 text-gray-400">
-                        <Pencil size={15} />
-                      </button>
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(String(item.id), String(item[nameKey] ?? ''))}
-                      className="hover:text-error-500 text-gray-400"
-                      disabled={deleteMutation.isPending}
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-          {!isLoading && !filtered?.length && (
-            <TableRow>
-              <TableCell className="py-10 text-center text-gray-400" colSpan={4}>
-                No {title.toLowerCase()} found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <DataTable
+        columns={columns}
+        data={(items ?? []) as SettingItem[]}
+        globalFilter={query}
+        loading={isLoading}
+        emptyMessage={`No ${title.toLowerCase()} found`}
+      />
     </div>
   );
 }

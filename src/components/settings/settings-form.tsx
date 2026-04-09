@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useCreateSetting, useUpdateSetting, useSettingsTable, SettingsTable } from '@/hooks';
+import { useCreateSetting, useUpdateSetting, useSettingsTable } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import { Input, Label, Button } from '@/components/ui';
+import type { SettingsTable } from '@/actions';
+import { toSettingsPath } from '@/lib';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -19,26 +21,17 @@ type FormData = z.infer<typeof schema>;
 interface SettingsFormProps {
   title: string;
   table: SettingsTable;
-  module: string;
-  nameKey: string;
-  basePath: string;
   editId?: string;
 }
 
-export function SettingsForm({
-  title,
-  table,
-  module,
-  nameKey,
-  basePath,
-  editId,
-}: SettingsFormProps) {
+export function SettingsForm({ title, table, editId }: SettingsFormProps) {
   const router = useRouter();
   const isEdit = !!editId;
+  const basePath = toSettingsPath(title);
 
   const { data: items } = useSettingsTable(table);
-  const createMutation = useCreateSetting(table, module);
-  const updateMutation = useUpdateSetting(table, module);
+  const createMutation = useCreateSetting(table);
+  const updateMutation = useUpdateSetting(table);
 
   const {
     register,
@@ -50,14 +43,14 @@ export function SettingsForm({
   useEffect(() => {
     if (isEdit && items) {
       const item = items.find((i: Record<string, unknown>) => i.id === editId);
-      if (item) reset({ name: String(item[nameKey] ?? ''), isActive: Boolean(item.isActive) });
+      if (item) reset({ name: String(item.name ?? ''), isActive: Boolean(item.is_active) });
     }
-  }, [isEdit, items, editId, nameKey, reset]);
+  }, [isEdit, items, editId, reset]);
 
   const onSubmit = async (data: FormData) => {
-    const payload = { [nameKey]: data.name, isActive: data.isActive };
+    const payload = { name: data.name, isActive: data.isActive };
     if (isEdit) {
-      await updateMutation.mutateAsync({ id: editId!, values: payload });
+      await updateMutation.mutateAsync({ id: editId!, data: payload });
     } else {
       await createMutation.mutateAsync(payload);
     }
@@ -93,7 +86,11 @@ export function SettingsForm({
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <Button type="submit" isLoading={isSubmitting} loadingText="Saving...">
+            <Button
+              type="submit"
+              isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending}
+              loadingText="Saving..."
+            >
               {isEdit ? 'Update' : 'Create'}
             </Button>
             <Button type="button" variant="outline" onClick={() => router.push(basePath)}>

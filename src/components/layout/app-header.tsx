@@ -22,8 +22,8 @@ export function AppHeader() {
     }
   };
 
-  const displayName = userProfile?.firstName
-    ? userProfile.firstName
+  const displayName = userProfile?.first_name
+    ? userProfile.first_name
     : (user?.email?.split('@')[0] ?? 'User');
 
   const email = userProfile?.email ?? user?.email ?? '';

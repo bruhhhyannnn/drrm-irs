@@ -1,20 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase, logActivity, userSchema, type UserFormData } from '@/lib';
+import { useUser, useCreateUser, useUpdateUser } from '@/hooks';
+import { useClusters, useUnits, usePositions, useUserTypes } from '@/hooks';
+import {
+  userCreateSchema,
+  userEditSchema,
+  type UserCreateFormData,
+  type UserEditFormData,
+} from '@/lib';
 import { PageBreadcrumb } from '@/components/common';
 import { Input, Label, Select, Button } from '@/components/ui';
 import toast from 'react-hot-toast';
-
-const USER_TYPE_OPTIONS = [
-  { value: '1', label: 'Admin' },
-  { value: '2', label: 'Encoder' },
-  { value: '3', label: 'Viewer' },
-];
 
 interface UserFormProps {
   editId?: string;
@@ -22,18 +22,21 @@ interface UserFormProps {
 
 export function UserForm({ editId }: UserFormProps) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const isEdit = !!editId;
 
-  const { data: existingUser } = useQuery({
-    queryKey: ['user', editId],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('users').select('*').eq('id', editId).single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: isEdit,
-  });
+  const { data: existingUser } = useUser(editId);
+  const createUser = useCreateUser();
+  const updateUser = useUpdateUser();
+
+  const { data: clusters = [] } = useClusters();
+  const { data: positions = [] } = usePositions();
+  const { data: userTypes = [] } = useUserTypes();
+
+  // Cluster is local state — used only to filter the units dropdown
+  const [selectedClusterId, setSelectedClusterId] = useState('');
+  const { data: units = [] } = useUnits(selectedClusterId || undefined);
+
+  const schema = isEdit ? userEditSchema : userCreateSchema;
 
   const {
     register,
@@ -42,98 +45,108 @@ export function UserForm({ editId }: UserFormProps) {
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<UserFormData>({
-    resolver: zodResolver(userSchema),
-    defaultValues: { isActive: true, usertype: 2 },
+  } = useForm<UserCreateFormData | UserEditFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { is_active: true },
   });
 
+  // Populate form when editing
   useEffect(() => {
     if (existingUser) {
       reset({
-        firstname: existingUser.firstname ?? '',
-        middlename: existingUser.middlename ?? '',
-        lastname: existingUser.lastname ?? '',
+        first_name: existingUser.first_name,
+        middle_name: existingUser.middle_name ?? '',
+        last_name: existingUser.last_name,
         suffix: existingUser.suffix ?? '',
-        username: existingUser.username ?? '',
-        email: existingUser.email ?? '',
-        cluster: existingUser.cluster ?? '',
-        office: existingUser.office ?? '',
-        bldgname: existingUser.bldgname ?? '',
-        encoder_position: existingUser.encoder_position ?? '',
-        usertype: existingUser.usertype ?? 2,
-        zone: existingUser.zone ?? '',
-        isActive: existingUser.isActive ?? true,
+        username: existingUser.username,
+        email: existingUser.email,
+        unit_id: existingUser.unit_id ?? '',
+        position_id: existingUser.position_id ?? '',
+        user_type_id: existingUser.user_type_id,
+        is_active: existingUser.is_active,
       });
+      // Pre-select the cluster so the units dropdown is populated
+      if (existingUser.unit?.cluster_id) {
+        setSelectedClusterId(existingUser.unit.cluster_id);
+      }
     }
   }, [existingUser, reset]);
 
-  const mutation = useMutation({
-    mutationFn: async (data: UserFormData) => {
-      if (isEdit) {
-        const { error } = await supabase.from('users').update(data).eq('id', editId);
-        if (error) throw error;
-        await logActivity({
-          action: 'update',
-          docID: editId!,
-          docName: data.lastname,
-          module: 'Users',
-          data,
-        });
-      } else {
-        const { data: created, error } = await supabase
-          .from('users')
-          .insert(data)
-          .select()
-          .single();
-        if (error) throw error;
-        await logActivity({
-          action: 'create',
-          docID: created.id,
-          docName: data.lastname,
-          module: 'Users',
-          data,
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success(isEdit ? 'User updated' : 'User created');
-      router.push('/users');
-    },
-    onError: (err: Error) => toast.error(err.message),
+  const onSubmit = handleSubmit((data) => {
+    const clean = {
+      ...data,
+      middle_name: data.middle_name || null,
+      suffix: data.suffix || null,
+      unit_id: data.unit_id || null,
+      position_id: data.position_id || null,
+    };
+
+    if (isEdit) {
+      const { auth_id: _, ...updateData } = clean as UserCreateFormData;
+      updateUser.mutate(
+        { id: editId!, data: updateData },
+        {
+          onSuccess: () => {
+            toast.success('User updated');
+            router.push('/users');
+          },
+          onError: (err) => toast.error(err.message),
+        }
+      );
+    } else {
+      createUser.mutate(clean as UserCreateFormData, {
+        onSuccess: () => {
+          toast.success('User created');
+          router.push('/users');
+        },
+        onError: (err) => toast.error(err.message),
+      });
+    }
   });
+
+  const clusterOptions = clusters.map((c) => ({ value: c.id, label: c.name }));
+  const unitOptions = units.map((u) => ({ value: u.id, label: u.name }));
+  const positionOptions = positions.map((p) => ({ value: p.id, label: p.name }));
+  const userTypeOptions = userTypes.map((t) => ({ value: t.id, label: t.name }));
+
+  const isPending = isSubmitting || createUser.isPending || updateUser.isPending;
 
   return (
     <div className="space-y-6">
       <PageBreadcrumb pageTitle={isEdit ? 'Edit User' : 'Add User'} />
 
       <div className="max-w-2xl rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-        <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-5">
+          {/* Personal Info */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <Label required>First Name</Label>
               <Input
-                error={!!errors.firstname}
-                hint={errors.firstname?.message}
-                {...register('firstname')}
+                error={!!errors.first_name}
+                hint={errors.first_name?.message}
+                {...register('first_name')}
               />
             </div>
             <div>
               <Label>Middle Name</Label>
-              <Input {...register('middlename')} />
+              <Input {...register('middle_name')} />
             </div>
             <div>
               <Label required>Last Name</Label>
               <Input
-                error={!!errors.lastname}
-                hint={errors.lastname?.message}
-                {...register('lastname')}
+                error={!!errors.last_name}
+                hint={errors.last_name?.message}
+                {...register('last_name')}
               />
             </div>
             <div>
               <Label>Suffix</Label>
               <Input placeholder="Jr., Sr., III" {...register('suffix')} />
             </div>
+          </div>
+
+          {/* Account Info */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <Label required>Username</Label>
               <Input
@@ -151,71 +164,83 @@ export function UserForm({ editId }: UserFormProps) {
                 {...register('email')}
               />
             </div>
+            {!isEdit && (
+              <div className="sm:col-span-2">
+                <Label required>Auth ID</Label>
+                <Input
+                  placeholder="Supabase auth UUID"
+                  error={!!(errors as { auth_id?: { message?: string } }).auth_id}
+                  hint={(errors as { auth_id?: { message?: string } }).auth_id?.message}
+                  {...register('auth_id' as keyof (UserCreateFormData | UserEditFormData))}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Role & Assignment */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-              <Label required>Cluster</Label>
-              <Input
-                error={!!errors.cluster}
-                hint={errors.cluster?.message}
-                {...register('cluster')}
+              <Label>Cluster</Label>
+              <Select
+                options={[{ value: '', label: 'Select cluster...' }, ...clusterOptions]}
+                value={selectedClusterId}
+                onChange={(v) => {
+                  setSelectedClusterId(v);
+                  setValue('unit_id', '');
+                }}
               />
             </div>
             <div>
-              <Label required>Office</Label>
-              <Input
-                error={!!errors.office}
-                hint={errors.office?.message}
-                {...register('office')}
+              <Label>Unit</Label>
+              <Select
+                options={[
+                  {
+                    value: '',
+                    label: selectedClusterId ? 'Select unit...' : 'Select a cluster first',
+                  },
+                  ...unitOptions,
+                ]}
+                value={watch('unit_id') ?? ''}
+                onChange={(v) => setValue('unit_id', v)}
+                error={!!errors.unit_id}
               />
             </div>
             <div>
-              <Label required>Building</Label>
-              <Input
-                error={!!errors.bldgname}
-                hint={errors.bldgname?.message}
-                {...register('bldgname')}
-              />
-            </div>
-            <div>
-              <Label required>Position</Label>
-              <Input
-                error={!!errors.encoder_position}
-                hint={errors.encoder_position?.message}
-                {...register('encoder_position')}
+              <Label>Position</Label>
+              <Select
+                options={[{ value: '', label: 'Select position...' }, ...positionOptions]}
+                value={watch('position_id') ?? ''}
+                onChange={(v) => setValue('position_id', v)}
+                error={!!errors.position_id}
               />
             </div>
             <div>
               <Label required>User Type</Label>
               <Select
-                options={USER_TYPE_OPTIONS}
-                value={String(watch('usertype'))}
-                onChange={(v) => setValue('usertype', Number(v))}
-                error={!!errors.usertype}
+                options={[{ value: '', label: 'Select type...' }, ...userTypeOptions]}
+                value={watch('user_type_id') ?? ''}
+                onChange={(v) => setValue('user_type_id', v)}
+                error={!!errors.user_type_id}
+                hint={errors.user_type_id?.message}
               />
-            </div>
-            <div>
-              <Label>Zone</Label>
-              <Input {...register('zone')} />
             </div>
           </div>
 
+          {/* Status */}
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
-              id="isActive"
-              {...register('isActive')}
+              id="is_active"
+              {...register('is_active')}
               className="h-4 w-4 rounded border-gray-300"
             />
-            <Label htmlFor="isActive" className="mb-0">
+            <Label htmlFor="is_active" className="mb-0">
               Active
             </Label>
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <Button
-              type="submit"
-              isLoading={isSubmitting || mutation.isPending}
-              loadingText="Saving..."
-            >
+            <Button type="submit" isLoading={isPending} loadingText="Saving...">
               {isEdit ? 'Update User' : 'Create User'}
             </Button>
             <Button type="button" variant="outline" onClick={() => router.push('/users')}>

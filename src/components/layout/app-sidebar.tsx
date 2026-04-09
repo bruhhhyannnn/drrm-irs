@@ -11,7 +11,6 @@ import {
   BarChart2,
   Users,
   Calendar,
-  Newspaper,
   Settings,
   ChevronDown,
 } from 'lucide-react';
@@ -27,24 +26,22 @@ type NavItem = {
 const navItems: NavItem[] = [
   { icon: <LayoutDashboard size={20} />, name: 'Home', path: '/' },
   { icon: <CalendarDays size={20} />, name: 'Events', path: '/events' },
-  { icon: <Newspaper size={20} />, name: 'News', path: '/news' },
-  { icon: <BarChart2 size={20} />, name: 'Reports', path: '/reports' },
   { icon: <Calendar size={20} />, name: 'Calendar', path: '/calendar' },
+  { icon: <BarChart2 size={20} />, name: 'Reports', path: '/reports' },
   { icon: <Users size={20} />, name: 'Users', path: '/users' },
   { icon: <ScrollText size={20} />, name: 'Activity Logs', path: '/activity-logs' },
   {
     icon: <Settings size={20} />,
     name: 'Settings',
     subItems: [
-      { name: 'Event Scenarios', path: '/settings/event-scenarios' },
-      { name: 'Event Actions', path: '/settings/event-actions' },
+      { name: 'Clusters', path: '/settings/clusters' },
+      { name: 'Units', path: '/settings/units' },
       { name: 'Locations', path: '/settings/locations' },
+      { name: 'Positions', path: '/settings/positions' },
       { name: 'User Types', path: '/settings/user-types' },
-      { name: 'Colleges/Units', path: '/settings/colleges' },
-      { name: 'Buildings/Zones', path: '/settings/buildings' },
-      { name: 'Observee Areas', path: '/settings/observee-areas' },
-      { name: 'Observee Roles', path: '/settings/observee-roles' },
-      { name: 'Remarks', path: '/settings/remarks' },
+      { name: 'Event Statuses', path: '/settings/event-statuses' },
+      { name: 'Casualty Conditions', path: '/settings/casualty-conditions' },
+      { name: 'Damage Reports', path: '/settings/damage-reports' },
     ],
   },
 ];
@@ -197,7 +194,7 @@ export function AppSidebar() {
       {/* Footer */}
       {isVisible && (
         <div className="border-t border-gray-200 p-4 dark:border-gray-800">
-          <p className="text-center text-xs text-gray-400">UP Manila DRRM-H © 2025</p>
+          <p className="text-center text-xs text-gray-400">UP Manila DRRM-H © 2026</p>
         </div>
       )}
     </aside>

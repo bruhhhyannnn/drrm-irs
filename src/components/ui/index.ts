@@ -6,5 +6,6 @@ export { Badge } from './badge';
 export { Modal } from './modal';
 export { Dropdown, DropdownItem } from './dropdown';
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './table';
+export { DataTable } from './data-table';
 export { Pagination } from './pagination';
 export { Spinner, PageLoader, PageError } from './spinner';

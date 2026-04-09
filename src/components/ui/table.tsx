@@ -59,7 +59,7 @@ export function TableHead({
   return (
     <th
       className={cn(
-        'text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400',
+        'text-theme-xs bg-gray-50 px-5 py-3 text-start font-medium text-gray-500 dark:bg-white/3 dark:text-gray-400',
         className
       )}
     >

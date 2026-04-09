@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/lib';
 import { useAuthStore } from '@/store';
+import { getUserByAuthId } from '@/actions';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setSession, setUserProfile, setLoading } = useAuthStore();
@@ -33,18 +34,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function fetchProfile(userId: string) {
     setLoading(true);
     try {
-      const { data } = await supabase.from('users').select('*').eq('authid', userId).maybeSingle();
-      if (data) {
-        setUserProfile({
-          id: data.id,
-          firstName: data.firstName ?? data.first_name ?? '',
-          lastName: data.lastName ?? data.last_name ?? '',
-          email: data.email ?? '',
-          contactNumber: data.contactNumber ?? data.phone ?? '',
-          userType: data.userType ?? data.usertype ?? 1,
-          photoURL: data.photoURL ?? null,
-        });
-      }
+      const user = await getUserByAuthId(userId);
+      setUserProfile(user ?? null);
     } catch (err) {
       console.error('Error fetching profile:', err);
     } finally {
