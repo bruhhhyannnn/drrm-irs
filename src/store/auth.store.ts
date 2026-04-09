@@ -1,16 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, Session } from '@supabase/supabase-js';
-
-export interface UserProfile {
-  id: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  contactNumber?: string;
-  userType?: number;
-  photoURL?: string | null;
-}
+import { User as UserProfile } from '@/generated/prisma/client';
 
 interface AuthState {
   user: User | null;
