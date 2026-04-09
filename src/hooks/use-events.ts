@@ -1,38 +1,46 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import type { Event } from '@/types/database';
-
-async function fetchEvents(query?: string): Promise<Event[]> {
-  let builder = supabase
-    .from('events')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100);
-
-  if (query) {
-    builder = builder.ilike('event_name', `%${query}%`);
-  }
-
-  const { data, error } = await builder;
-  if (error) throw error;
-  return data ?? [];
-}
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getEvents, getEvent, createEvent, updateEvent, deleteEvent } from '@/actions/events';
+import type { Prisma } from '@/generated/prisma/client';
 
 export function useEvents(query?: string) {
   return useQuery({
     queryKey: ['events', query],
-    queryFn: () => fetchEvents(query),
+    queryFn: () => getEvents(query),
   });
 }
 
 export function useEvent(id?: string) {
   return useQuery({
     queryKey: ['event', id],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('events').select('*').eq('id', id).single();
-      if (error) throw error;
-      return data as Event;
-    },
+    queryFn: () => getEvent(id!),
     enabled: !!id,
+  });
+}
+
+export function useCreateEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Prisma.EventCreateInput) => createEvent(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['events'] }),
+  });
+}
+
+export function useUpdateEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Prisma.EventUpdateInput }) =>
+      updateEvent(id, data),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', id] });
+    },
+  });
+}
+
+export function useDeleteEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteEvent(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['events'] }),
   });
 }

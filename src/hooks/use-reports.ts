@@ -1,51 +1,70 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import type { Report } from '@/types/database';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getReports,
+  getReport,
+  getReportsByEvent,
+  createReport,
+  updateReport,
+  deleteReport,
+  getReportClusterSummary,
+} from '@/actions/reports';
+import type { Prisma, Report } from '@/generated/prisma/client';
 
-const PER_PAGE = 10;
-
-interface ReportsResult {
-  data: Report[];
-  total: number;
-}
-
-async function fetchReports(page: number, query?: string): Promise<ReportsResult> {
-  let builder = supabase.from('reports').select('*', { count: 'exact' });
-
-  if (query) {
-    builder = builder.or(
-      `cluster.ilike.%${query}%,college_unit.ilike.%${query}%,encoder_name.ilike.%${query}%`
-    );
-  }
-
-  const from = (page - 1) * PER_PAGE;
-  builder = builder.order('created_at', { ascending: false }).range(from, from + PER_PAGE - 1);
-
-  const { data, error, count } = await builder;
-  if (error) throw error;
-  return { data: data ?? [], total: count ?? 0 };
-}
-
-export function useReports(page: number, query?: string) {
+export function useReports(page: number = 1, query?: string) {
   return useQuery({
     queryKey: ['reports', page, query],
-    queryFn: () => fetchReports(page, query),
+    queryFn: () => getReports(page, query),
+  });
+}
+
+export function useReport(id?: string) {
+  return useQuery({
+    queryKey: ['report', id],
+    queryFn: () => getReport(id!),
+    enabled: !!id,
   });
 }
 
 export function useEventReports(eventId?: string) {
   return useQuery({
     queryKey: ['event-reports', eventId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('reports')
-        .select('*')
-        .eq('event_id', eventId)
-        .order('submitted_at', { ascending: true });
-      if (error) throw error;
-      return data as Report[];
-    },
+    queryFn: () => getReportsByEvent(eventId!),
     enabled: !!eventId,
+  });
+}
+
+export function useCreateReport() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Prisma.ReportCreateInput) => createReport(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports'] }),
+  });
+}
+
+export function useUpdateReport() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Prisma.ReportUpdateInput }) =>
+      updateReport(id, data),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+      queryClient.invalidateQueries({ queryKey: ['report', id] });
+    },
+  });
+}
+
+export function useDeleteReport() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteReport(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports'] }),
+  });
+}
+
+export function useReportClusterSummary() {
+  return useQuery({
+    queryKey: ['report-cluster-summary'],
+    queryFn: () => getReportClusterSummary(),
   });
 }
 
