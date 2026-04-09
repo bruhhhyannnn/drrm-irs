@@ -1,0 +1,274 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  auth_id       String        @unique @db.Uuid
+  unit_id       String?       @db.Uuid
+  position_id   String?       @db.Uuid
+  user_type_id  String        @db.Uuid
+  username      String        @unique
+  email         String        @unique
+  first_name    String        @default("")
+  middle_name   String?
+  last_name     String        @default("")
+  suffix        String?
+  is_active     Boolean       @default(true)
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  activity_logs ActivityLog[]
+  events        Event[]       @relation("CreatedBy")
+  reports       Report[]
+  unit          Unit?         @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  position      Position?     @relation(fields: [position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_type     UserType      @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("users")
+}
+
+model Cluster {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String             @unique
+  is_active          Boolean            @default(true)
+  created_at         DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime           @default(now()) @updatedAt @db.Timestamptz(6)
+  units              Unit[]
+  locations          Location[]
+  report_assignments ReportAssignment[]
+  reports            Report[]
+
+  @@map("clusters")
+}
+
+model Unit {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String
+  cluster_id         String             @db.Uuid
+  is_active          Boolean            @default(true)
+  created_at         DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime           @default(now()) @updatedAt @db.Timestamptz(6)
+  cluster            Cluster            @relation(fields: [cluster_id], references: [id], onDelete: Cascade)
+  users              User[]
+  report_assignments ReportAssignment[]
+  reports            Report[]
+
+  @@unique([name, cluster_id])
+  @@map("units")
+}
+
+model Event {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String?            @db.Uuid
+  location_id        String?            @db.Uuid
+  status_id          String             @db.Uuid
+  name               String
+  description        String?
+  quarter            String?
+  started_at         DateTime?          @db.Timestamptz(6)
+  ended_at           DateTime?          @db.Timestamptz(6)
+  created_at         DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime           @default(now()) @updatedAt @db.Timestamptz(6)
+  user               User?              @relation("CreatedBy", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  location           Location?          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status             EventStatus        @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  report_assignments ReportAssignment[]
+  reports            Report[]
+
+  @@index([user_id])
+  @@map("events")
+}
+
+model Report {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  event_id    String  @db.Uuid
+  user_id     String? @db.Uuid
+  cluster_id  String  @db.Uuid
+  unit_id     String? @db.Uuid
+  location_id String? @db.Uuid
+
+  faculty_members      Int @default(0)
+  admin_members        Int @default(0)
+  reps_members         Int @default(0)
+  ra_members           Int @default(0)
+  students             Int @default(0)
+  philcare_staff       Int @default(0)
+  security_personnel   Int @default(0)
+  construction_workers Int @default(0)
+  tenants              Int @default(0)
+  health_workers       Int @default(0)
+  non_academic_staff   Int @default(0)
+  guests               Int @default(0)
+
+  // Cached counts — kept for quick dashboard reads; stay in sync with junction rows
+  missing_count    Int @default(0)
+  casualties_count Int @default(0)
+
+  external_item_id String?
+  submitted_at     DateTime @default(now()) @db.Timestamptz(6)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  event           Event                 @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user            User?                 @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cluster         Cluster               @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  unit            Unit?                 @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  location        Location?             @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  missing_persons ReportMissingPerson[]
+  casualties      ReportCasualty[]
+  damages         ReportDamage[]
+
+  @@index([event_id])
+  @@index([user_id])
+  @@index([cluster_id])
+  @@map("reports")
+}
+
+model ReportAssignment {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  event_id   String   @db.Uuid
+  cluster_id String   @db.Uuid
+  unit_id    String?  @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  event      Event    @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  cluster    Cluster  @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  unit       Unit?    @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([event_id, cluster_id])
+  @@index([event_id])
+  @@index([cluster_id])
+  @@map("report_assignments")
+}
+
+model ActivityLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String?  @db.Uuid
+  user_email String?
+  action     String
+  module     String
+  doc_id     String?
+  doc_name   String?
+  data       Json?
+  status     String   @default("success")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  user       User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([created_at])
+  @@map("activity_logs")
+}
+
+// ─── Lookup Tables ─────────────────────────────────────────────────
+model Location {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  cluster_id String   @db.Uuid
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  cluster    Cluster  @relation(fields: [cluster_id], references: [id], onDelete: Cascade)
+  events     Event[]
+  reports    Report[]
+
+  @@unique([name, cluster_id])
+  @@map("locations")
+}
+
+model CasualtyCondition {
+  id         String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String           @unique
+  is_active  Boolean          @default(true)
+  created_at DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
+  casualties ReportCasualty[]
+
+  @@map("casualty_conditions")
+}
+
+model ReportCasualty {
+  id           String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id    String            @db.Uuid
+  condition_id String            @db.Uuid
+  count        Int               @default(0)
+  names        String?
+  created_at   DateTime          @default(now()) @db.Timestamptz(6)
+  report       Report            @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  condition    CasualtyCondition @relation(fields: [condition_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([report_id, condition_id])
+  @@index([report_id])
+  @@map("report_casualties")
+}
+
+model ReportMissingPerson {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id  String   @db.Uuid
+  name       String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  report     Report   @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([report_id])
+  @@map("report_missing_persons")
+}
+
+model DamageCondition {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String         @unique
+  is_active      Boolean        @default(true)
+  created_at     DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  report_damages ReportDamage[]
+
+  @@map("damage_conditions")
+}
+
+model ReportDamage {
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id           String          @db.Uuid
+  damage_condition_id String          @db.Uuid
+  created_at          DateTime        @default(now()) @db.Timestamptz(6)
+  report              Report          @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  damage_report       DamageCondition @relation(fields: [damage_condition_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([report_id, damage_condition_id])
+  @@index([report_id])
+  @@map("report_damages")
+}
+
+model Position {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @unique
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  users      User[]
+
+  @@map("positions")
+}
+
+model UserType {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @unique
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  users      User[]
+
+  @@map("user_types")
+}
+
+model EventStatus {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @unique
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  events     Event[]
+
+  @@map("event_statuses")
+}
