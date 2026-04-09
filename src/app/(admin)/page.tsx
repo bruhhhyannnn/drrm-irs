@@ -1,14 +1,209 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib';
 import { PageBreadcrumb } from '@/components/common';
 import { Badge } from '@/components/ui';
 import { format } from 'date-fns';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from 'recharts';
 import { CalendarDays, FileText, Users, AlertTriangle } from 'lucide-react';
+import { useEvents, useReports, useUsers, useReportClusterSummary } from '@/hooks';
 
-const CHART_COLORS = ['#a11d1d', '#c53030', '#d65a5a', '#e58e8e', '#f5c6c6'];
+const CLUSTER_COLOR = '#a11d1d';
+
+const STATUS_COLORS: Record<string, string> = {
+  upcoming: '#f59e0b',
+  ongoing: '#22c55e',
+  completed: CLUSTER_COLOR,
+  Unknown: '#9ca3af',
+};
+
+export default function DashboardPage() {
+  const { data: events } = useEvents();
+  const { data: reportsData } = useReports(1);
+  const { data: users = [] } = useUsers();
+  const { data: clusterSummary = [] } = useReportClusterSummary();
+
+  const stats = {
+    events: events?.length,
+    reports: reportsData?.total ?? 0,
+    users: users.length,
+  };
+
+  const statusData = Object.entries(
+    (events ?? []).reduce(
+      (acc, e) => {
+        const key = e.status?.name ?? 'Unknown';
+        acc[key] = (acc[key] ?? 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    )
+  ).map(([name, value]) => ({ name, value }));
+
+  return (
+    <div className="space-y-6">
+      <PageBreadcrumb pageTitle="Dashboard" />
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          title="Total Events"
+          value={stats?.events ?? '—'}
+          icon={<CalendarDays size={20} />}
+          color="brand"
+        />
+        <StatCard
+          title="Total Reports"
+          value={stats?.reports ?? '—'}
+          icon={<FileText size={20} />}
+          color="success"
+        />
+        <StatCard
+          title="Total Users"
+          value={stats?.users ?? '—'}
+          icon={<Users size={20} />}
+          color="warning"
+        />
+        <StatCard
+          title="Active Incidents"
+          value="—"
+          icon={<AlertTriangle size={20} />}
+          color="error"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {/* Recent Events */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
+          <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
+            Recent Events
+          </h3>
+          <div className="space-y-3">
+            {events?.map((event) => (
+              <div
+                key={event.id}
+                className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 dark:bg-white/2"
+              >
+                <div>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white">{event.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {event.started_at ? format(new Date(event.started_at), 'MMM d, yyyy') : '—'}
+                  </p>
+                </div>
+                <Badge
+                  color={
+                    event.status.name === 'ongoing'
+                      ? 'success'
+                      : event.status.name === 'completed'
+                        ? 'primary'
+                        : 'warning'
+                  }
+                  size="sm"
+                >
+                  {event.status.name}
+                </Badge>
+              </div>
+            ))}
+            {!events?.length && (
+              <div className="flex h-60 items-center justify-center">
+                <p className="text-sm text-gray-400">No events yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Events by Status chart */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
+          <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
+            Events by Status
+          </h3>
+          {statusData.length ? (
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {statusData.map((entry) => (
+                    <Cell
+                      key={entry.name}
+                      fill={STATUS_COLORS[entry.name] ?? STATUS_COLORS.Unknown}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-60 items-center justify-center">
+              <p className="text-sm text-gray-400">No data yet</p>
+            </div>
+          )}
+        </div>
+
+        {/* Reports by Cluster chart */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 xl:col-span-2 dark:border-white/5 dark:bg-white/3">
+          <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
+            Reports by Cluster
+          </h3>
+          {clusterSummary.length ? (
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={clusterSummary} margin={{ top: 0, right: 16, left: -16, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(156,163,175,0.2)" />
+                <XAxis
+                  dataKey="cluster"
+                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: 'rgba(17,24,39,0.9)',
+                    border: 'none',
+                    borderRadius: 8,
+                    color: '#f9fafb',
+                    fontSize: 13,
+                  }}
+                />
+                <Legend />
+                <Bar dataKey="reports" name="Reports" fill={CLUSTER_COLOR} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="casualties" name="Casualties" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="missing" name="Missing" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-60 items-center justify-center">
+              <p className="text-sm text-gray-400">No reports submitted yet</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function StatCard({
   title,
@@ -52,156 +247,6 @@ function StatCard({
       <div
         className={`absolute -right-6 -bottom-6 h-24 w-24 rounded-full ${bg[color]} opacity-20`}
       />
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  const { data: events } = useQuery({
-    queryKey: ['dashboard-events'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('events')
-        .select('event_id, eventname, status, category, timestampstart')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      return data ?? [];
-    },
-  });
-
-  const { data: stats } = useQuery({
-    queryKey: ['dashboard-stats'],
-    queryFn: async () => {
-      const [eventsRes, reportsRes, usersRes] = await Promise.all([
-        supabase.from('events').select('*', { count: 'exact', head: true }),
-        supabase.from('reports').select('*', { count: 'exact', head: true }),
-        supabase.from('users').select('*', { count: 'exact', head: true }),
-      ]);
-      return {
-        events: eventsRes.count ?? 0,
-        reports: reportsRes.count ?? 0,
-        users: usersRes.count ?? 0,
-      };
-    },
-  });
-
-  const { data: categoryData } = useQuery({
-    queryKey: ['dashboard-categories'],
-    queryFn: async () => {
-      const { data } = await supabase.from('events').select('category');
-      if (!data) return [];
-      const counts: Record<string, number> = {};
-      data.forEach((e) => {
-        counts[e.category] = (counts[e.category] ?? 0) + 1;
-      });
-      return Object.entries(counts).map(([name, value]) => ({ name, value }));
-    },
-  });
-
-  return (
-    <div className="space-y-6">
-      <PageBreadcrumb pageTitle="Dashboard" />
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title="Total Events"
-          value={stats?.events ?? '—'}
-          icon={<CalendarDays size={20} />}
-          color="brand"
-        />
-        <StatCard
-          title="Total Reports"
-          value={stats?.reports ?? '—'}
-          icon={<FileText size={20} />}
-          color="success"
-        />
-        <StatCard
-          title="Total Users"
-          value={stats?.users ?? '—'}
-          icon={<Users size={20} />}
-          color="warning"
-        />
-        <StatCard
-          title="Active Incidents"
-          value="—"
-          icon={<AlertTriangle size={20} />}
-          color="error"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {/* Recent Events */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-          <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
-            Recent Events
-          </h3>
-          <div className="space-y-3">
-            {events?.map((event) => (
-              <div
-                key={event.event_id}
-                className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 dark:bg-white/2"
-              >
-                <div>
-                  <p className="text-sm font-medium text-gray-800 dark:text-white">
-                    {event.eventname}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {event.timestampstart
-                      ? format(new Date(event.timestampstart), 'MMM d, yyyy')
-                      : '—'}
-                  </p>
-                </div>
-                <Badge
-                  color={
-                    event.status === 'active'
-                      ? 'success'
-                      : event.status === 'completed'
-                        ? 'primary'
-                        : 'warning'
-                  }
-                  size="sm"
-                >
-                  {event.status}
-                </Badge>
-              </div>
-            ))}
-            {!events?.length && <p className="text-center text-sm text-gray-400">No events yet</p>}
-          </div>
-        </div>
-
-        {/* Events by Category chart */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-          <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
-            Events by Category
-          </h3>
-          {categoryData?.length ? (
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {categoryData.map((_entry, index) => (
-                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex h-60 items-center justify-center">
-              <p className="text-sm text-gray-400">No data yet</p>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

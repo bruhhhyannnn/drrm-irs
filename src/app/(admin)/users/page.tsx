@@ -3,48 +3,102 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Search, Plus, Pencil } from 'lucide-react';
-import { useUsers } from '@/hooks';
-import { supabase } from '@/lib';
+import { useUsers, useToggleUserStatus } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  Badge,
-  Input,
-  Button,
-  Spinner,
-} from '@/components/ui';
-import { useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import type { getUsers } from '@/actions/users';
+import type { ColumnDef } from '@tanstack/react-table';
+import { DataTable, Badge, Input, Button, Spinner } from '@/components/ui';
 
-const USER_TYPE_LABELS: Record<number, string> = {
-  1: 'Admin',
-  2: 'Encoder',
-  3: 'Viewer',
-};
+type UserRow = Awaited<ReturnType<typeof getUsers>>[number];
 
 export default function UsersPage() {
   const [query, setQuery] = useState('');
-  const { data: users, isLoading } = useUsers(query);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  const queryClient = useQueryClient();
+  const { data: users = [], isLoading } = useUsers(query);
+  const toggleStatus = useToggleUserStatus();
 
-  const handleToggleStatus = async (id: string, current: boolean) => {
+  const handleToggleStatus = (id: string, current: boolean) => {
     if (!confirm(`${current ? 'Deactivate' : 'Activate'} this user?`)) return;
-    setTogglingId(id);
-    const { error } = await supabase.from('users').update({ isActive: !current }).eq('id', id);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success(`User ${current ? 'deactivated' : 'activated'}`);
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    }
-    setTogglingId(null);
+    toggleStatus.mutate({ id, current });
   };
+
+  const columns: ColumnDef<UserRow, unknown>[] = [
+    {
+      id: 'name',
+      header: 'Name',
+      accessorFn: (r) => `${r.first_name ?? ''} ${r.last_name ?? ''}`,
+      cell: ({ row: { original: r } }) => (
+        <span className="font-medium text-gray-900 dark:text-white">
+          {[r.first_name, r.middle_name, r.last_name, r.suffix].filter(Boolean).join(' ')}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'email',
+      header: 'Email',
+    },
+    {
+      id: 'cluster',
+      header: 'Cluster',
+      accessorFn: (r) => r.unit?.cluster?.name ?? '',
+      cell: ({ row: { original: r } }) => r.unit?.cluster?.name ?? '—',
+    },
+    {
+      id: 'unit',
+      header: 'Unit',
+      accessorFn: (r) => r.unit?.name ?? '',
+      cell: ({ row: { original: r } }) => r.unit?.name ?? '—',
+    },
+    {
+      id: 'position',
+      header: 'Position',
+      accessorFn: (r) => r.position?.name ?? '',
+      cell: ({ row: { original: r } }) => r.position?.name ?? '—',
+    },
+    {
+      id: 'type',
+      header: 'Type',
+      accessorFn: (r) => r.user_type.name,
+      cell: ({ row: { original: r } }) => (
+        <Badge color="primary" size="sm">
+          {r.user_type.name}
+        </Badge>
+      ),
+      enableSorting: false,
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      accessorFn: (r) => (r.is_active ? 'Active' : 'Inactive'),
+      cell: ({ row: { original: r } }) => (
+        <button
+          onClick={() => handleToggleStatus(r.id, r.is_active)}
+          disabled={toggleStatus.isPending}
+          className="cursor-pointer"
+        >
+          <Badge color={r.is_active ? 'success' : 'error'} size="sm">
+            {r.is_active ? 'Active' : 'Inactive'}
+          </Badge>
+        </button>
+      ),
+      enableSorting: false,
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row: { original: r } }) => (
+        <div className="flex items-center gap-2">
+          <Link href={`/users/edit/${r.id}`}>
+            <button className="hover:text-brand-500 text-gray-400">
+              <Pencil size={15} />
+            </button>
+          </Link>
+        </div>
+      ),
+      enableSorting: false,
+    },
+  ];
+
+  if (isLoading) return <Spinner center />;
 
   return (
     <div className="space-y-6">
@@ -65,73 +119,7 @@ export default function UsersPage() {
         </Link>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Username</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Cluster</TableHead>
-            <TableHead>Position</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell className="py-10 text-center" colSpan={8}>
-                <Spinner center />
-              </TableCell>
-            </TableRow>
-          ) : (
-            users?.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium text-gray-900 dark:text-white">
-                  {[user.firstname, user.middlename, user.lastname].filter(Boolean).join(' ')}
-                </TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.cluster}</TableCell>
-                <TableCell>{user.encoder_position}</TableCell>
-                <TableCell>
-                  <Badge color="primary" size="sm">
-                    {USER_TYPE_LABELS[user.usertype] ?? `Type ${user.usertype}`}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <button
-                    onClick={() => handleToggleStatus(user.id, user.is_active ?? true)}
-                    disabled={togglingId === user.id}
-                    className="cursor-pointer"
-                  >
-                    <Badge color={user.is_active ? 'success' : 'error'} size="sm">
-                      {user.is_active ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </button>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Link href={`/users/edit/${user.id}`}>
-                      <button className="hover:text-brand-500 text-gray-400">
-                        <Pencil size={15} />
-                      </button>
-                    </Link>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-          {!isLoading && !users?.length && (
-            <TableRow>
-              <TableCell className="py-10 text-center text-gray-400" colSpan={8}>
-                No users found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <DataTable columns={columns} data={users} emptyMessage="No users found" />
     </div>
   );
 }

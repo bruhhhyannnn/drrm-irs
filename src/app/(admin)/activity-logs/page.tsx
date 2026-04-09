@@ -86,9 +86,7 @@ export default function ActivityLogsPage() {
                     {log.action}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-xs">
-                  {log.initiated_by_display ?? log.initiated_by}
-                </TableCell>
+                <TableCell className="text-xs">{log.user_id}</TableCell>
               </TableRow>
             ))
           )}

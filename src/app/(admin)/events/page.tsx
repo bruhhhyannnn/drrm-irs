@@ -47,7 +47,6 @@ export default function EventsPage() {
           <TableRow>
             <TableHead>Date & Time</TableHead>
             <TableHead>Event Name</TableHead>
-            <TableHead>Category</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
@@ -60,22 +59,21 @@ export default function EventsPage() {
                 {event.started_at ? format(new Date(event.started_at), 'MMM d, yyyy h:mm a') : '—'}
               </TableCell>
               <TableCell className="font-medium text-gray-900 dark:text-white">
-                {event.event_name}
+                {event.name}
               </TableCell>
-              <TableCell>{event.category}</TableCell>
-              <TableCell>{event.location}</TableCell>
+              <TableCell>{event.location?.name || '—'}</TableCell>
               <TableCell>
                 <Badge
                   color={
-                    event.status === 'active'
+                    event.status.name === 'active'
                       ? 'success'
-                      : event.status === 'completed'
+                      : event.status.name === 'completed'
                         ? 'primary'
                         : 'warning'
                   }
                   size="sm"
                 >
-                  {event.status}
+                  {event.status.name}
                 </Badge>
               </TableCell>
               <TableCell>

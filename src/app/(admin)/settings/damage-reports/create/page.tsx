@@ -1,4 +1,4 @@
 import { SettingsForm } from '@/components/settings';
 export default function CreatePage() {
-  return <SettingsForm title="User Types" table="user_types" />;
+  return <SettingsForm title="Damage Conditions" table="damage_conditions" />;
 }
