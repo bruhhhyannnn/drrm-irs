@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getEvents, getEvent, createEvent, updateEvent, deleteEvent } from '@/actions/events';
-import type { Prisma } from '@/generated/prisma/client';
+import type { Prisma } from '@prisma/client';
 
 export function useEvents(query?: string) {
   return useQuery({

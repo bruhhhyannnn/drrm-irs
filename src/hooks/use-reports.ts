@@ -8,7 +8,7 @@ import {
   deleteReport,
   getReportClusterSummary,
 } from '@/actions/reports';
-import type { Prisma, Report } from '@/generated/prisma/client';
+import type { Prisma, Report } from '@prisma/client';
 
 export function useReports(page: number = 1, query?: string) {
   return useQuery({

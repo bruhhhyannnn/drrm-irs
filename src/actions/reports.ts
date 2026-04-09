@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import type { Prisma } from '@/generated/prisma/client';
+import type { Prisma } from '@prisma/client';
 
 const PER_PAGE = 10;
 
