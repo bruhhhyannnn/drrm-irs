@@ -185,7 +185,7 @@ export function UserForm({ editId }: UserFormProps) {
                 options={[{ value: '', label: 'Select cluster...' }, ...clusterOptions]}
                 value={selectedClusterId}
                 onChange={(v) => {
-                  setSelectedClusterId(v);
+                  setSelectedClusterId(v.target.value);
                   setValue('unit_id', '');
                 }}
               />
@@ -201,7 +201,7 @@ export function UserForm({ editId }: UserFormProps) {
                   ...unitOptions,
                 ]}
                 value={watch('unit_id') ?? ''}
-                onChange={(v) => setValue('unit_id', v)}
+                onChange={(v) => setValue('unit_id', '')}
                 error={!!errors.unit_id}
               />
             </div>
@@ -210,7 +210,7 @@ export function UserForm({ editId }: UserFormProps) {
               <Select
                 options={[{ value: '', label: 'Select position...' }, ...positionOptions]}
                 value={watch('position_id') ?? ''}
-                onChange={(v) => setValue('position_id', v)}
+                onChange={(v) => setValue('position_id', '')}
                 error={!!errors.position_id}
               />
             </div>
@@ -219,7 +219,7 @@ export function UserForm({ editId }: UserFormProps) {
               <Select
                 options={[{ value: '', label: 'Select type...' }, ...userTypeOptions]}
                 value={watch('user_type_id') ?? ''}
-                onChange={(v) => setValue('user_type_id', v)}
+                onChange={(v) => setValue('user_type_id', '')}
                 error={!!errors.user_type_id}
                 hint={errors.user_type_id?.message}
               />

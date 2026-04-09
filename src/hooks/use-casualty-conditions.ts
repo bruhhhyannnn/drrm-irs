@@ -25,7 +25,7 @@ export function useCasualtyConditions() {
 export function useCreateCasualtyCondition() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { name: string; is_active?: boolean }) => createCasualtyCondition(data),
+    mutationFn: (data: { name: string; is_active?: boolean }) => createCasualtyCondition(data.name),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['casualty_conditions'] }),
   });
 }

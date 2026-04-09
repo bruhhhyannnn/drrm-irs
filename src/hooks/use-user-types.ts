@@ -25,7 +25,7 @@ export function useUserTypes() {
 export function useCreateUserType() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { name: string; is_active?: boolean }) => createUserType(data),
+    mutationFn: (data: { name: string; is_active?: boolean }) => createUserType(data.name),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user_types'] }),
   });
 }

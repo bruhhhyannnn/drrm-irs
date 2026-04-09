@@ -25,7 +25,7 @@ export function usePosition(id?: string) {
 export function useCreatePosition() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { name: string; is_active?: boolean }) => createPosition(data),
+    mutationFn: (data: { name: string; is_active?: boolean }) => createPosition(data.name),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['positions'] }),
   });
 }

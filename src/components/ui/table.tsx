@@ -52,12 +52,15 @@ export function TableRow({
 export function TableHead({
   children,
   className,
+  onClick,
 }: {
   children: React.ReactNode;
   className?: string;
+  onClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
 }) {
   return (
     <th
+      onClick={onClick}
       className={cn(
         'text-theme-xs bg-gray-50 px-5 py-3 text-start font-medium text-gray-500 dark:bg-white/3 dark:text-gray-400',
         className

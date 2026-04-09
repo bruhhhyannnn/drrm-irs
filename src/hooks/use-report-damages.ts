@@ -12,7 +12,8 @@ export function useReportDamages(reportId?: string) {
 export function useToggleReportDamage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { report_id: string; damage_report_id: string }) => toggleReportDamage(data),
+    mutationFn: (data: { report_id: string; damage_condition_id: string }) =>
+      toggleReportDamage(data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['report-damages', variables.report_id] });
     },

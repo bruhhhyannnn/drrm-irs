@@ -19,7 +19,7 @@ export function useCluster(id?: string) {
 export function useCreateCluster() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { name: string; is_active?: boolean }) => createCluster(data),
+    mutationFn: (data: { name: string; is_active?: boolean }) => createCluster(data.name),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clusters'] }),
   });
 }

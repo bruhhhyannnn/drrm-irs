@@ -25,7 +25,7 @@ export function useEventStatuses() {
 export function useCreateEventStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { name: string; is_active?: boolean }) => createEventStatus(data),
+    mutationFn: (data: { name: string; is_active?: boolean }) => createEventStatus(data.name),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['event_statuses'] }),
   });
 }

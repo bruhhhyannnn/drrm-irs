@@ -25,7 +25,7 @@ export function useDamageConditions() {
 export function useCreateDamageCondition() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { name: string; is_active?: boolean }) => createDamageCondition(data),
+    mutationFn: (data: { name: string; is_active?: boolean }) => createDamageCondition(data.name),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['damage_reports'] }),
   });
 }
