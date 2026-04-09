@@ -20,21 +20,21 @@ export const signUpSchema = z
   });
 
 /* ─── User ─── */
-export const userSchema = z.object({
-  firstname: z.string().min(1, 'First name is required'),
-  middlename: z.string().optional(),
-  lastname: z.string().min(1, 'Last name is required'),
+export const userCreateSchema = z.object({
+  auth_id: z.string().uuid('Must be a valid Supabase auth UUID'),
+  first_name: z.string().min(1, 'First name is required'),
+  middle_name: z.string().optional(),
+  last_name: z.string().min(1, 'Last name is required'),
   suffix: z.string().optional(),
   username: z.string().min(3, 'Username must be at least 3 characters'),
   email: z.string().email('Invalid email address'),
-  cluster: z.string().min(1, 'Cluster is required'),
-  office: z.string().min(1, 'Office is required'),
-  bldgname: z.string().min(1, 'Building is required'),
-  encoder_position: z.string().min(1, 'Position is required'),
-  usertype: z.coerce.number().min(1, 'User type is required'),
-  zone: z.string().optional(),
-  isActive: z.boolean().default(true),
+  unit_id: z.string().uuid().optional().nullable(),
+  position_id: z.string().uuid().optional().nullable(),
+  user_type_id: z.string().uuid('User type is required'),
+  is_active: z.boolean().default(true),
 });
+
+export const userEditSchema = userCreateSchema.omit({ auth_id: true });
 
 /* ─── Building ─── */
 export const buildingSchema = z.object({
@@ -51,7 +51,7 @@ export const collegeSchema = z.object({
 
 /* ─── Location ─── */
 export const locationSchema = z.object({
-  locationName: z.string().min(1, 'Location name is required'),
+  name: z.string().min(1, 'Location name is required'),
   isActive: z.boolean().default(true),
 });
 
@@ -93,21 +93,12 @@ export const userTypeSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-/* ─── News ─── */
-export const newsSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  content: z.string().min(1, 'Content is required'),
-  author: z.string().min(1, 'Author is required'),
-  category: z.string().min(1, 'Category is required'),
-  is_active: z.boolean().default(true),
-  image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
-  source_url: z.string().url('Invalid URL').optional().or(z.literal('')),
-});
-
 /* ─── Inferred types ─── */
 export type SignInFormData = z.infer<typeof signInSchema>;
 export type SignUpFormData = z.infer<typeof signUpSchema>;
-export type UserFormData = z.infer<typeof userSchema>;
+export type UserCreateFormData = z.infer<typeof userCreateSchema>;
+export type UserEditFormData = z.infer<typeof userEditSchema>;
+export type UserFormData = UserCreateFormData;
 export type BuildingFormData = z.infer<typeof buildingSchema>;
 export type CollegeFormData = z.infer<typeof collegeSchema>;
 export type LocationFormData = z.infer<typeof locationSchema>;
@@ -117,4 +108,3 @@ export type ObserveeAreaFormData = z.infer<typeof observeeAreaSchema>;
 export type ObserveeRoleFormData = z.infer<typeof observeeRoleSchema>;
 export type RemarkFormData = z.infer<typeof remarkSchema>;
 export type UserTypeFormData = z.infer<typeof userTypeSchema>;
-export type NewsFormData = z.infer<typeof newsSchema>;
