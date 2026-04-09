@@ -1,0 +1,137 @@
+'use server';
+
+import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
+import type { Prisma } from '@/generated/prisma/client';
+
+const PER_PAGE = 10;
+
+export async function getReports(page: number = 1, query?: string) {
+  const where = query
+    ? {
+        OR: [
+          { cluster: { name: { contains: query, mode: 'insensitive' as const } } },
+          { unit: { name: { contains: query, mode: 'insensitive' as const } } },
+          { event: { name: { contains: query, mode: 'insensitive' as const } } },
+        ],
+      }
+    : undefined;
+
+  const [data, total] = await Promise.all([
+    prisma.report.findMany({
+      where,
+      include: {
+        // TODO: might select only a few
+        event: true,
+        user: {
+          select: {
+            first_name: true,
+            last_name: true,
+            position: { select: { name: true } },
+          },
+        },
+        cluster: { select: { name: true } },
+        unit: { select: { name: true } },
+        location: { select: { name: true } },
+      },
+      orderBy: { created_at: 'desc' },
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+    }),
+    prisma.report.count({ where }),
+  ]);
+
+  return { data, total };
+}
+
+export async function getReport(id: string) {
+  return prisma.report.findUnique({
+    where: { id },
+    include: {
+      // TODO: might select only a few
+      event: true,
+      user: {
+        select: {
+          first_name: true,
+          last_name: true,
+          position: { select: { name: true } },
+        },
+      },
+      cluster: { select: { name: true } },
+      unit: { select: { name: true } },
+      location: { select: { name: true } },
+      missing_persons: { select: { name: true } },
+      casualties: {
+        include: { condition: { select: { name: true } } },
+      },
+      damages: {
+        // TODO: possibly change the damage_report to damage_condition
+        include: { damage_report: { select: { name: true } } },
+      },
+    },
+  });
+}
+
+export async function getReportsByEvent(eventId: string) {
+  return prisma.report.findMany({
+    where: { event_id: eventId },
+    orderBy: { created_at: 'asc' },
+    include: {
+      user: {
+        select: {
+          first_name: true,
+          last_name: true,
+          position: { select: { name: true } },
+        },
+      },
+      cluster: { select: { name: true } },
+      unit: { select: { name: true } },
+      location: { select: { name: true } },
+      missing_persons: { select: { name: true } },
+      casualties: {
+        include: { condition: { select: { name: true } } },
+      },
+      damages: {
+        // TODO: possibly change the damage_report to damage_condition
+        include: { damage_report: { select: { name: true } } },
+      },
+    },
+  });
+}
+
+export async function createReport(data: Prisma.ReportCreateInput) {
+  const report = await prisma.report.create({ data });
+  revalidatePath('/reports');
+  return report;
+}
+
+export async function updateReport(id: string, data: Prisma.ReportUpdateInput) {
+  const report = await prisma.report.update({ where: { id }, data });
+  revalidatePath('/reports');
+  return report;
+}
+
+export async function deleteReport(id: string) {
+  await prisma.report.delete({ where: { id } });
+  revalidatePath('/reports');
+}
+
+export async function getReportClusterSummary() {
+  const [rows, clusters] = await Promise.all([
+    prisma.report.groupBy({
+      by: ['cluster_id'],
+      _count: { id: true },
+      _sum: { casualties_count: true, missing_count: true },
+    }),
+    prisma.cluster.findMany({ select: { id: true, name: true } }),
+  ]);
+
+  const nameMap = Object.fromEntries(clusters.map((c) => [c.id, c.name]));
+
+  return rows.map((r) => ({
+    cluster: nameMap[r.cluster_id] ?? 'Unknown',
+    reports: r._count.id,
+    casualties: r._sum.casualties_count ?? 0,
+    missing: r._sum.missing_count ?? 0,
+  }));
+}
