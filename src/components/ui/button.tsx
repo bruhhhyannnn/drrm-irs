@@ -12,18 +12,19 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses = {
   primary:
-    'bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 dark:disabled:bg-brand-800',
+    'bg-brand-500 text-white hover:bg-brand-600 disabled:bg-brand-300 dark:disabled:bg-brand-800 shadow-[inset_0_3px_4px_rgba(255,255,255,0.35),inset_0_-3px_4px_rgba(0,0,0,0.35)]',
   outline:
-    'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-white/5',
+    'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-white/5 shadow-[inset_0_3px_4px_rgba(255,255,255,0.6),inset_0_-3px_4px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_3px_4px_rgba(255,255,255,0.06),inset_0_-3px_4px_rgba(0,0,0,0.35)]',
   ghost:
-    'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
-  danger: 'bg-error-500 text-white hover:bg-error-600 disabled:bg-error-300',
+    'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white hover:shadow-[inset_0_3px_4px_rgba(255,255,255,0.5),inset_0_-3px_4px_rgba(0,0,0,0.08)] dark:hover:shadow-[inset_0_3px_4px_rgba(255,255,255,0.06),inset_0_-3px_4px_rgba(0,0,0,0.35)]',
+  danger:
+    'bg-error-500 text-white hover:bg-error-600 disabled:bg-error-300 shadow-[inset_0_3px_4px_rgba(255,255,255,0.35),inset_0_-3px_4px_rgba(0,0,0,0.35)]',
 };
 
 const sizeClasses = {
-  sm: 'px-3 py-2 text-sm',
-  md: 'px-5 py-3 text-sm',
-  lg: 'px-6 py-3.5 text-base',
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-sm',
+  lg: 'px-8 py-3.5 text-base',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -47,7 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition',
+          'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200',
           variantClasses[variant],
           sizeClasses[size],
           (disabled || isLoading) && 'cursor-not-allowed opacity-50',
