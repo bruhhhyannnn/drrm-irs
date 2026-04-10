@@ -20,7 +20,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-2">
         <Spinner size="lg" />
-        <p className="text-brand-500 font-bold">Thinking ...</p>
+        <p className="text-brand-500 font-bold">Getting NSED reports ...</p>
       </div>
     );
   }

@@ -91,9 +91,7 @@ export function AppSidebar() {
         )}
       >
         <Link href="/" className="flex items-center gap-3">
-          <div className="bg-brand-500 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white">
-            UPM
-          </div>
+          <img src="/irs-favicon.png" alt="IRS Logo" className="h-12 w-12 object-contain" />
           {isVisible && (
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">IRS</span>
