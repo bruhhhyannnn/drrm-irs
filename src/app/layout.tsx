@@ -6,11 +6,11 @@ import { Providers } from '@/components/providers';
 const outfit = Outfit({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'UPM DRRM-H - IRS',
+  title: 'DRRM-H - IRS',
   description:
     'UP Manila Disaster Risk Reduction Management and Health Program - Incident Reporting System',
   icons: {
-    icon: '/logo.svg',
+    icon: '/irs-favicon.png',
   },
 };
 
