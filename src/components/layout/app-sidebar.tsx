@@ -78,7 +78,7 @@ export function AppSidebar() {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        'fixed top-0 left-0 z-9 flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 dark:border-gray-800 dark:bg-gray-900',
+        'fixed top-0 left-0 z-2 flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 dark:border-gray-800 dark:bg-gray-900',
         isVisible ? 'w-72.5' : 'w-20',
         isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}

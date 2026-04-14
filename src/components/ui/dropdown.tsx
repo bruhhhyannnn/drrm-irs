@@ -33,7 +33,7 @@ export function Dropdown({ isOpen, onClose, children, className }: DropdownProps
     <div
       ref={ref}
       className={cn(
-        'shadow-theme-lg dark:bg-gray-dark absolute right-0 z-40 mt-2 rounded-xl border border-gray-200 bg-white dark:border-gray-800',
+        'shadow-theme-lg dark:bg-gray-dark absolute right-0 z-1 mt-2 rounded-xl border border-gray-200 bg-white dark:border-gray-800',
         className
       )}
     >

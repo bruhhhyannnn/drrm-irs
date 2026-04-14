@@ -4,18 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Eye, EyeOff } from 'lucide-react';
-import { supabase } from '@/lib';
+import { SignInFormData, signInSchema, supabase } from '@/lib';
 import { useAuthStore } from '@/store';
 import { Button, Input, Label } from '@/components/ui';
-
-const signInSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-type SignInFormData = z.infer<typeof signInSchema>;
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -103,7 +95,7 @@ export function SignInForm() {
             <button
               type="button"
               onClick={() => setShowPassword((p) => !p)}
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-all duration-200 hover:text-gray-600"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>

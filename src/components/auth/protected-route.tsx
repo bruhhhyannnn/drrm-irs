@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store';
 import { Spinner } from '../ui';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, userProfile, loading } = useAuthStore();
+  const { user, loading } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -16,18 +16,15 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, router]);
 
-  if (loading && !userProfile) {
+  if (!user && loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-2">
+      <div className="flex min-h-screen items-center justify-center">
         <Spinner size="lg" />
-        <p className="text-brand-500 font-bold">Getting NSED reports ...</p>
       </div>
     );
   }
 
-  if (!loading && !user) {
-    return null;
-  }
+  if (!loading && !user) return null;
 
   return <>{children}</>;
 }
