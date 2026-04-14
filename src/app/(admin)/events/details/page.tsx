@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { useEvent, useEventReports } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import { Badge, Spinner } from '@/components/ui';
-import { CLUSTERS, HEADCOUNT_FIELDS } from '@/types/constants';
+import { CLUSTERS, HEADCOUNT_FIELDS } from '@/types';
 import {
   Users,
   MapPin,

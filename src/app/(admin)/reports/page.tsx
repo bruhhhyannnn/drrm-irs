@@ -32,14 +32,6 @@ function totalAffected(r: ReportRow) {
 
 const columns: ColumnDef<ReportRow, unknown>[] = [
   {
-    id: 'event',
-    header: 'Event',
-    accessorFn: (r) => r.event.name,
-    cell: ({ row: { original: r } }) => (
-      <span className="font-medium text-gray-900 dark:text-white">{r.event.name}</span>
-    ),
-  },
-  {
     id: 'cluster',
     header: 'Cluster',
     accessorFn: (r) => r.cluster.name,

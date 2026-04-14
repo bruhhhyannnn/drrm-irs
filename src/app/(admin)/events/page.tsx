@@ -52,7 +52,6 @@ export default function EventsPage() {
           <TableRow>
             <TableHead>Date & Time</TableHead>
             <TableHead>Event Name</TableHead>
-            <TableHead>Location</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
@@ -66,7 +65,6 @@ export default function EventsPage() {
               <TableCell className="font-medium text-gray-900 dark:text-white">
                 {event.name}
               </TableCell>
-              <TableCell>{event.location?.name || '—'}</TableCell>
               <TableCell>
                 <Badge
                   color={

@@ -85,7 +85,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Recent Events */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
+        <div className="shadow-theme-sm rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
           <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
             Recent Events
           </h3>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Events by Status chart */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
+        <div className="shadow-theme-sm rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
           <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
             Events by Status
           </h3>
@@ -159,7 +159,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Reports by Cluster chart */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 xl:col-span-2 dark:border-white/5 dark:bg-white/3">
+        <div className="shadow-theme-xs rounded-xl border border-gray-200 bg-white p-6 xl:col-span-2 dark:border-white/5 dark:bg-white/3">
           <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
             Reports by Cluster
           </h3>
@@ -230,7 +230,7 @@ function StatCard({
   };
 
   return (
-    <div className="shadow-theme-sm relative overflow-hidden rounded-xl bg-white p-6 ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10">
+    <div className="shadow-theme-md relative overflow-hidden rounded-xl bg-white p-6 ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10">
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className={`text-sm font-medium ${text[color]}`}>{title}</p>

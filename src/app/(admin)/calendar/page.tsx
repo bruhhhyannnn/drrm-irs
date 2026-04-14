@@ -45,7 +45,7 @@ export default function CalendarPage() {
           <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
             Events this month ({events.length})
           </h3>
-          <div className="space-y-2">
+          <div className="shadow-theme-md space-y-2">
             {events.map((event) => (
               <div
                 key={event.id}
@@ -75,7 +75,7 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+      <div className="shadow-theme-sm rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
         {/* Calendar header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-white/5">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
