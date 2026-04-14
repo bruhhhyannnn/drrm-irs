@@ -82,7 +82,7 @@ export function UserForm({ editId }: UserFormProps) {
     };
 
     if (isEdit) {
-      const { auth_id: _, ...updateData } = clean as UserCreateFormData;
+      const { password: _, ...updateData } = clean as UserCreateFormData;
       updateUser.mutate(
         { id: editId!, data: updateData },
         {
@@ -166,12 +166,13 @@ export function UserForm({ editId }: UserFormProps) {
             </div>
             {!isEdit && (
               <div className="sm:col-span-2">
-                <Label required>Auth ID</Label>
+                <Label required>Password</Label>
                 <Input
-                  placeholder="Supabase auth UUID"
-                  error={!!(errors as { auth_id?: { message?: string } }).auth_id}
-                  hint={(errors as { auth_id?: { message?: string } }).auth_id?.message}
-                  {...register('auth_id' as keyof (UserCreateFormData | UserEditFormData))}
+                  type="password"
+                  placeholder="Min. 8 characters"
+                  error={!!(errors as { password?: { message?: string } }).password}
+                  hint={(errors as { password?: { message?: string } }).password?.message}
+                  {...register('password' as keyof (UserCreateFormData | UserEditFormData))}
                 />
               </div>
             )}
@@ -182,10 +183,11 @@ export function UserForm({ editId }: UserFormProps) {
             <div>
               <Label>Cluster</Label>
               <Select
-                options={[{ value: '', label: 'Select cluster...' }, ...clusterOptions]}
+                options={clusterOptions}
+                placeholder="Select cluster..."
                 value={selectedClusterId}
-                onChange={(v) => {
-                  setSelectedClusterId(v.target.value);
+                onChange={(e) => {
+                  setSelectedClusterId(e.target.value);
                   setValue('unit_id', '');
                 }}
               />
@@ -193,33 +195,30 @@ export function UserForm({ editId }: UserFormProps) {
             <div>
               <Label>Unit</Label>
               <Select
-                options={[
-                  {
-                    value: '',
-                    label: selectedClusterId ? 'Select unit...' : 'Select a cluster first',
-                  },
-                  ...unitOptions,
-                ]}
+                options={unitOptions}
+                placeholder="Select unit..."
                 value={watch('unit_id') ?? ''}
-                onChange={(v) => setValue('unit_id', '')}
+                onChange={(e) => setValue('unit_id', e.target.value)}
                 error={!!errors.unit_id}
               />
             </div>
             <div>
               <Label>Position</Label>
               <Select
-                options={[{ value: '', label: 'Select position...' }, ...positionOptions]}
+                options={positionOptions}
+                placeholder="Select position..."
                 value={watch('position_id') ?? ''}
-                onChange={(v) => setValue('position_id', '')}
+                onChange={(e) => setValue('position_id', e.target.value)}
                 error={!!errors.position_id}
               />
             </div>
             <div>
               <Label required>User Type</Label>
               <Select
-                options={[{ value: '', label: 'Select type...' }, ...userTypeOptions]}
+                options={userTypeOptions}
+                placeholder="Select type..."
                 value={watch('user_type_id') ?? ''}
-                onChange={(v) => setValue('user_type_id', '')}
+                onChange={(e) => setValue('user_type_id', e.target.value)}
                 error={!!errors.user_type_id}
                 hint={errors.user_type_id?.message}
               />

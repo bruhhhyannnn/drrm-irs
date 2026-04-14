@@ -1,11 +1,11 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { revalidatePath } from 'next/cache';
 
-// TODO: change this one
 export type CreateUserInput = {
-  auth_id: string;
+  password: string;
   first_name: string;
   middle_name?: string | null;
   last_name: string;
@@ -18,7 +18,7 @@ export type CreateUserInput = {
   is_active?: boolean;
 };
 
-export type UpdateUserInput = Omit<Partial<CreateUserInput>, 'auth_id'>;
+export type UpdateUserInput = Omit<Partial<CreateUserInput>, 'password'>;
 
 export async function getUsers(query?: string) {
   return prisma.user.findMany({
@@ -52,9 +52,26 @@ export async function getUserByAuthId(authId: string) {
 }
 
 export async function createUser(data: CreateUserInput) {
-  const user = await prisma.user.create({ data });
-  revalidatePath('/users');
-  return user;
+  const { password, ...profileData } = data;
+
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    email: profileData.email,
+    password,
+    email_confirm: true, // skip confirmation email, admin is creating the account
+  });
+
+  if (authError) throw new Error(authError.message);
+
+  const auth_id = authData.user.id;
+
+  try {
+    const user = await prisma.user.create({ data: { ...profileData, auth_id } });
+    revalidatePath('/users');
+    return user;
+  } catch (err) {
+    await supabaseAdmin.auth.admin.deleteUser(auth_id);
+    throw err;
+  }
 }
 
 export async function updateUser(id: string, data: UpdateUserInput) {
