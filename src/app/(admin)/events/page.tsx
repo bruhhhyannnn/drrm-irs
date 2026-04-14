@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Search, Eye } from 'lucide-react';
@@ -21,10 +21,15 @@ import {
 
 export default function EventsPage() {
   const [query, setQuery] = useState('');
-  const { data: events, isLoading, error } = useEvents(query);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const { data: events, isPending, isFetching, error } = useEvents(debouncedQuery);
 
-  if (isLoading) return <Spinner center />;
   if (error) return <PageError message={error.message} />;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 400);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <div className="space-y-6">
@@ -87,9 +92,16 @@ export default function EventsPage() {
               </TableCell>
             </TableRow>
           ))}
-          {!events?.length && (
+          {(isPending || isFetching) && (
             <TableRow>
-              <TableCell className="py-10 text-center text-gray-400" colSpan={6}>
+              <TableCell className="py-10" colSpan={5}>
+                <Spinner center />
+              </TableCell>
+            </TableRow>
+          )}
+          {!events?.length && !isPending && !isFetching && (
+            <TableRow>
+              <TableCell className="py-10 text-center text-gray-400" colSpan={5}>
                 No events found
               </TableCell>
             </TableRow>

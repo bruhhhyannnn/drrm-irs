@@ -1,19 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Search, Plus, Pencil } from 'lucide-react';
 import { useUsers, useToggleUserStatus } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import type { getUsers } from '@/actions/users';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, Badge, Input, Button, Spinner } from '@/components/ui';
+import { DataTable, Badge, Input, Button, PageError } from '@/components/ui';
 
 type UserRow = Awaited<ReturnType<typeof getUsers>>[number];
 
 export default function UsersPage() {
   const [query, setQuery] = useState('');
-  const { data: users = [], isLoading } = useUsers(query);
+  const [debounceQuery, setDebounceQuery] = useState('');
+  const { data: users = [], isPending, isFetching, error } = useUsers(debounceQuery);
   const toggleStatus = useToggleUserStatus();
 
   const handleToggleStatus = (id: string, current: boolean) => {
@@ -98,7 +99,12 @@ export default function UsersPage() {
     },
   ];
 
-  if (isLoading) return <Spinner center />;
+  if (error) return <PageError message={error.message} />;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounceQuery(query), 400);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <div className="space-y-6">
@@ -119,7 +125,12 @@ export default function UsersPage() {
         </Link>
       </div>
 
-      <DataTable columns={columns} data={users} emptyMessage="No users found" />
+      <DataTable
+        columns={columns}
+        data={users ?? []}
+        loading={isPending || isFetching}
+        emptyMessage="No users found"
+      />
     </div>
   );
 }

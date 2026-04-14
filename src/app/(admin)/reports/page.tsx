@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Search } from 'lucide-react';
 import { useReports } from '@/hooks';
@@ -112,12 +112,18 @@ const columns: ColumnDef<ReportRow, unknown>[] = [
 
 export default function ReportsPage() {
   const [query, setQuery] = useState('');
+  const [debounceQuery, setDebounceQuery] = useState('');
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useReports(page, query);
+  const { data, isPending, isFetching, error } = useReports(page, debounceQuery);
 
   if (error) return <PageError message={error.message} />;
 
   const totalPages = Math.ceil((data?.total ?? 0) / PER_PAGE);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounceQuery(query), 400);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <div className="space-y-6">
@@ -125,7 +131,11 @@ export default function ReportsPage() {
 
       <div className="flex items-center gap-3">
         <div className="relative max-w-sm flex-1">
-          <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+          <Search
+            size={16}
+            // TODO: icon on dark mode not showing
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-600"
+          />
           <Input
             placeholder="Search reports..."
             className="pl-9"
@@ -142,7 +152,7 @@ export default function ReportsPage() {
       <DataTable
         columns={columns}
         data={data?.data ?? []}
-        loading={isLoading}
+        loading={isPending || isFetching}
         emptyMessage="No reports found"
       />
 

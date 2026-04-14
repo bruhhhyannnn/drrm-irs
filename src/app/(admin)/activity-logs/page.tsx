@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Search } from 'lucide-react';
 import { useActivityLogs } from '@/hooks';
@@ -16,6 +16,7 @@ import {
   Input,
   Pagination,
   Spinner,
+  PageError,
 } from '@/components/ui';
 
 const PER_PAGE = 10;
@@ -28,10 +29,18 @@ const actionColor = {
 
 export default function ActivityLogsPage() {
   const [query, setQuery] = useState('');
+  const [debounceQuery, setDebounceQuery] = useState('');
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useActivityLogs(page, query);
+  const { data, isPending, isFetching, error } = useActivityLogs(page, debounceQuery);
 
   const totalPages = Math.ceil((data?.total ?? 0) / PER_PAGE);
+
+  if (error) return <PageError message={error.message} />;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounceQuery(query), 400);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <div className="space-y-6">
@@ -64,33 +73,32 @@ export default function ActivityLogsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading ? (
+          {data?.data.map((log) => (
+            <TableRow key={log.id}>
+              <TableCell>
+                {log.created_at ? format(new Date(log.created_at), 'MMM d, yyyy h:mm a') : '—'}
+              </TableCell>
+              <TableCell className="font-medium">{log.module}</TableCell>
+              <TableCell>{log.doc_name}</TableCell>
+              <TableCell>
+                <Badge
+                  color={actionColor[log.action as keyof typeof actionColor] ?? 'light'}
+                  size="sm"
+                >
+                  {log.action}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-xs">{log.user_id}</TableCell>
+            </TableRow>
+          ))}
+          {(isPending || isFetching) && (
             <TableRow>
-              <TableCell className="py-10 text-center" colSpan={5}>
+              <TableCell className="py-10" colSpan={5}>
                 <Spinner center />
               </TableCell>
             </TableRow>
-          ) : (
-            data?.data.map((log) => (
-              <TableRow key={log.id}>
-                <TableCell>
-                  {log.created_at ? format(new Date(log.created_at), 'MMM d, yyyy h:mm a') : '—'}
-                </TableCell>
-                <TableCell className="font-medium">{log.module}</TableCell>
-                <TableCell>{log.doc_name}</TableCell>
-                <TableCell>
-                  <Badge
-                    color={actionColor[log.action as keyof typeof actionColor] ?? 'light'}
-                    size="sm"
-                  >
-                    {log.action}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-xs">{log.user_id}</TableCell>
-              </TableRow>
-            ))
           )}
-          {!isLoading && !data?.data.length && (
+          {!data?.data.length && !isPending && !isFetching && (
             <TableRow>
               <TableCell className="py-10 text-center text-gray-400" colSpan={5}>
                 No logs found

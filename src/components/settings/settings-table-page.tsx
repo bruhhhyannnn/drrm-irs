@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { useSettingsTable, useDeleteSetting } from '@/hooks';
@@ -9,7 +9,7 @@ import { PageBreadcrumb } from '@/components/common';
 import type { SettingsTable } from '@/actions';
 import { toSettingsPath } from '@/lib';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, Badge, Button, Input } from '@/components/ui';
+import { DataTable, Badge, Button, Input, PageError } from '@/components/ui';
 
 interface SettingsPageProps {
   title: string;
@@ -25,7 +25,8 @@ type SettingItem = {
 
 export function SettingsTablePage({ title, table }: SettingsPageProps) {
   const [query, setQuery] = useState('');
-  const { data: items, isLoading } = useSettingsTable(table);
+  const [debounceQuery, setDebounceQuery] = useState('');
+  const { data: items, isPending, isFetching, error } = useSettingsTable(table);
   const deleteMutation = useDeleteSetting(table);
 
   const basePath = toSettingsPath(title);
@@ -83,6 +84,16 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
     },
   ];
 
+  if (error) return <PageError message={error.message} />;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebounceQuery(query);
+      console.log('TEST!');
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [query]);
+
   return (
     <div className="space-y-6">
       <PageBreadcrumb pageTitle={title} />
@@ -105,8 +116,8 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
       <DataTable
         columns={columns}
         data={(items ?? []) as SettingItem[]}
-        globalFilter={query}
-        loading={isLoading}
+        globalFilter={debounceQuery}
+        loading={isPending || isFetching}
         emptyMessage={`No ${title.toLowerCase()} found`}
       />
     </div>
