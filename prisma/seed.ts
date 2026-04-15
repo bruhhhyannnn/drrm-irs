@@ -9,7 +9,7 @@ import {
   USER_TYPES,
   EVENT_STATUSES,
   DAMAGE_CONDITION,
-} from '@/types/constants';
+} from '@/types';
 import 'dotenv/config';
 
 const adapter = new PrismaPg({ connectionString: process.env.SHADOW_DATABASE_URL! });

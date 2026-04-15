@@ -15,6 +15,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/lib';
+import Image from 'next/image';
 
 type NavItem = {
   name: string;
@@ -91,7 +92,13 @@ export function AppSidebar() {
         )}
       >
         <Link href="/" className="flex items-center gap-3">
-          <img src="/irs-favicon.png" alt="IRS Logo" className="h-12 w-12 object-contain" />
+          <Image
+            src="/irs-favicon.png"
+            alt="IRS Logo"
+            width={64}
+            height={64}
+            className="object-contain"
+          />
           {isVisible && (
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">IRS</span>
