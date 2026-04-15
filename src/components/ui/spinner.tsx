@@ -1,4 +1,5 @@
 import { cn } from '@/lib';
+import Image from 'next/image';
 
 interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg';
@@ -12,16 +13,19 @@ const sizeMap = {
   lg: 'h-12 w-12',
 };
 
-export function Spinner({ size = 'sm', center = false, className }: SpinnerProps) {
+export function Spinner({ size = 'md', center = false, className }: SpinnerProps) {
   return (
     <div
       className={cn(
-        'border-brand-500 animate-spin rounded-full border-4 border-t-transparent',
-        center ? 'mx-auto' : '',
+        'relative flex items-center justify-center',
+        center && 'mx-auto',
         sizeMap[size],
         className
       )}
-    />
+    >
+      <Image src="/irs-favicon.png" alt="DRRM-H Logo" fill className="object-contain" />
+      <div className="absolute inset-0 animate-spin rounded-full bg-linear-to-tr from-30% to-white" />
+    </div>
   );
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib';
 
@@ -21,7 +21,20 @@ export function Modal({
   showCloseButton = true,
   isFullscreen = false,
 }: ModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMounted(true);
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+      const timer = setTimeout(() => setMounted(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -38,34 +51,46 @@ export function Modal({
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!mounted) return null;
 
   return (
-    <div className="fixed inset-0 z-9 flex items-center justify-center overflow-y-auto">
+    <div
+      className={cn(
+        'fixed inset-0 z-2 flex items-stretch justify-end',
+        !isVisible && 'pointer-events-none'
+      )}
+    >
+      {/* Backdrop */}
       {!isFullscreen && (
         <div
-          className="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-sm"
+          className={cn(
+            'fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity duration-300',
+            isVisible ? 'opacity-100' : 'opacity-0'
+          )}
           onClick={onClose}
         />
       )}
+
+      {/* Panel */}
       <div
-        ref={modalRef}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'relative w-full',
-          !isFullscreen && 'shadow-theme-lg rounded-2xl bg-white dark:bg-gray-900',
+          'relative flex h-screen w-full flex-col bg-white shadow-2xl dark:bg-gray-900',
+          'transition-transform duration-300 ease-in-out',
+          isVisible ? 'translate-x-0' : 'translate-x-full',
+          !isFullscreen && 'sm:max-w-md sm:rounded-l-2xl',
           className
         )}
       >
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
+            className="absolute top-4 right-4 z-2 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <X size={18} />
           </button>
         )}
-        {children}
+        <div className="flex-1 overflow-y-auto p-6">{children}</div>
       </div>
     </div>
   );

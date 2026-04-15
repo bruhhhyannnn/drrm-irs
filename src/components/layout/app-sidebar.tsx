@@ -88,7 +88,8 @@ export function AppSidebar() {
       <div
         className={cn(
           'flex items-center border-b border-gray-200 py-4 dark:border-gray-800',
-          isVisible ? 'justify-start px-6' : 'justify-center px-4'
+          isVisible ? 'justify-start px-6' : 'justify-center px-4',
+          isMobileOpen && 'mt-16'
         )}
       >
         <Link href="/" className="flex items-center gap-3">
