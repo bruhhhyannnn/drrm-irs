@@ -9,18 +9,10 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
-  showCloseButton?: boolean;
   isFullscreen?: boolean;
 }
 
-export function Modal({
-  isOpen,
-  onClose,
-  children,
-  className,
-  showCloseButton = true,
-  isFullscreen = false,
-}: ModalProps) {
+export function Modal({ isOpen, onClose, children, className, isFullscreen = false }: ModalProps) {
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -75,21 +67,19 @@ export function Modal({
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'relative flex h-screen w-full flex-col bg-white shadow-2xl dark:bg-gray-900',
+          'bg-brand-25 relative flex h-screen w-full flex-col shadow-2xl dark:bg-gray-800',
           'transition-transform duration-300 ease-in-out',
           isVisible ? 'translate-x-0' : 'translate-x-full',
-          !isFullscreen && 'sm:max-w-md sm:rounded-l-2xl',
+          !isFullscreen && 'sm:max-w-2xl sm:rounded-l-2xl',
           className
         )}
       >
-        {showCloseButton && (
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-2 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            <X size={18} />
-          </button>
-        )}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-6 z-2 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-700 dark:hover:text-white"
+        >
+          <X size={18} />
+        </button>
         <div className="flex-1 overflow-y-auto p-6">{children}</div>
       </div>
     </div>

@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Search, Plus, Pencil } from 'lucide-react';
+import { Search, Plus, UserPen } from 'lucide-react';
 import { useUsers, useToggleUserStatus } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import type { getUsers } from '@/actions/users';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, Badge, Input, Button, PageError } from '@/components/ui';
+import { DataTable, Badge, Input, Button, PageError, Modal } from '@/components/ui';
+import { UserForm } from '@/components/users';
 
 type UserRow = Awaited<ReturnType<typeof getUsers>>[number];
 
@@ -16,6 +16,13 @@ export default function UsersPage() {
   const [debounceQuery, setDebounceQuery] = useState('');
   const { data: users = [], isPending, isFetching, error } = useUsers(debounceQuery);
   const toggleStatus = useToggleUserStatus();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editId, setEditId] = useState('');
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setEditId('');
+  };
 
   const handleToggleStatus = (id: string, current: boolean) => {
     if (!confirm(`${current ? 'Deactivate' : 'Activate'} this user?`)) return;
@@ -87,50 +94,61 @@ export default function UsersPage() {
       id: 'actions',
       header: 'Actions',
       cell: ({ row: { original: r } }) => (
-        <div className="flex items-center gap-2">
-          <Link href={`/users/edit/${r.id}`}>
-            <button className="hover:text-brand-500 text-gray-400">
-              <Pencil size={15} />
-            </button>
-          </Link>
+        <div className="flex flex-row items-center gap-2">
+          <button
+            className="hover:text-brand-600 inline-flex items-center gap-1.5 text-sm text-gray-400 transition-all duration-100"
+            onClick={() => {
+              setIsModalOpen(true);
+              setEditId(r.id);
+            }}
+          >
+            <UserPen size={15} />
+            Edit
+          </button>
         </div>
       ),
       enableSorting: false,
     },
   ];
 
-  if (error) return <PageError message={error.message} />;
-
   useEffect(() => {
     const timer = setTimeout(() => setDebounceQuery(query), 400);
     return () => clearTimeout(timer);
   }, [query]);
 
-  return (
-    <div className="space-y-6">
-      <PageBreadcrumb pageTitle="Users" />
+  if (error) return <PageError message={error.message} />;
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="relative max-w-sm flex-1">
-          <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder="Search users..."
-            className="pl-9"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+  return (
+    <>
+      <div className="space-y-6">
+        <PageBreadcrumb pageTitle="Users" />
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="relative max-w-sm flex-1">
+            <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search users..."
+              className="pl-9"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <Button onClick={() => setIsModalOpen(true)} startIcon={<Plus size={16} />}>
+            Add User
+          </Button>
         </div>
-        <Link href="/users/create">
-          <Button startIcon={<Plus size={16} />}>Add User</Button>
-        </Link>
+
+        <DataTable
+          columns={columns}
+          data={users ?? []}
+          loading={isPending || isFetching}
+          emptyMessage="No users found"
+        />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={users ?? []}
-        loading={isPending || isFetching}
-        emptyMessage="No users found"
-      />
-    </div>
+      <Modal isOpen={isModalOpen} onClose={handleClose}>
+        <UserForm editId={editId} onSuccess={handleClose} onCancel={handleClose} />
+      </Modal>
+    </>
   );
 }

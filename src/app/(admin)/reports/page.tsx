@@ -2,16 +2,197 @@
 
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { Search } from 'lucide-react';
-import { useReports } from '@/hooks';
+import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { useReports, useDeleteReport } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import type { getReports } from '@/actions/reports';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, Badge, Input, Pagination, PageError } from '@/components/ui';
+import {
+  DataTable,
+  Badge,
+  Input,
+  Pagination,
+  PageError,
+  Modal,
+  Button,
+  ConfirmDialog,
+} from '@/components/ui';
+import { ReportForm } from '@/components/reports';
 
 type ReportRow = Awaited<ReturnType<typeof getReports>>['data'][number];
 
 const PER_PAGE = 10;
+
+export default function ReportsPage() {
+  const [query, setQuery] = useState('');
+  const [debounceQuery, setDebounceQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const { data, isPending, isFetching, error } = useReports(page, debounceQuery);
+  const deleteReport = useDeleteReport();
+  const [editId, setEditId] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState('');
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setEditId('');
+  };
+
+  const totalPages = Math.ceil((data?.total ?? 0) / PER_PAGE);
+
+  const columns: ColumnDef<ReportRow, unknown>[] = [
+    {
+      id: 'cluster',
+      header: 'Cluster',
+      accessorFn: (r) => r.cluster.name,
+      cell: ({ row: { original: r } }) => (
+        <Badge color="primary" size="sm">
+          {r.cluster.name}
+        </Badge>
+      ),
+    },
+    {
+      id: 'unit',
+      header: 'Unit',
+      accessorFn: (r) => r.unit?.name ?? '',
+      cell: ({ row: { original: r } }) => r.unit?.name ?? '—',
+    },
+    {
+      id: 'location',
+      header: 'Location',
+      accessorFn: (r) => r.location?.name ?? '',
+      cell: ({ row: { original: r } }) => (
+        <span className="max-w-50 truncate">{r.location?.name ?? '—'}</span>
+      ),
+    },
+    {
+      id: 'total_affected',
+      header: 'Total Affected',
+      accessorFn: (r) => totalAffected(r),
+      cell: ({ row: { original: r } }) => <span className="font-medium">{totalAffected(r)}</span>,
+    },
+    {
+      id: 'casualties',
+      header: 'Casualties',
+      accessorFn: (r) => r.casualties_count ?? 0,
+      cell: ({ row: { original: r } }) =>
+        (r.casualties_count ?? 0) > 0 ? (
+          <Badge color="error" size="sm">
+            {r.casualties_count}
+          </Badge>
+        ) : (
+          <span className="text-gray-400">0</span>
+        ),
+    },
+    {
+      id: 'missing',
+      header: 'Missing',
+      accessorFn: (r) => r.missing_count ?? 0,
+      cell: ({ row: { original: r } }) =>
+        (r.missing_count ?? 0) > 0 ? (
+          <Badge color="warning" size="sm">
+            {r.missing_count}
+          </Badge>
+        ) : (
+          <span className="text-gray-400">0</span>
+        ),
+    },
+    {
+      id: 'date',
+      header: 'Date',
+      accessorFn: (r) => r.created_at ?? '',
+      cell: ({ row: { original: r } }) =>
+        r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : '—',
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row: { original: r } }) => (
+        <div className="flex flex-row items-center gap-3">
+          <button
+            className="hover:text-brand-600 inline-flex items-center gap-1.5 text-sm text-gray-400 transition-all duration-100"
+            onClick={() => {
+              setIsModalOpen(true);
+              setEditId(r.id);
+            }}
+          >
+            <Pencil size={15} />
+          </button>
+          <button
+            className="hover:text-error-500 text-gray-400 transition-all duration-100"
+            onClick={() => setDeleteId(r.id)}
+          >
+            <Trash2 size={15} />
+          </button>
+        </div>
+      ),
+      enableSorting: false,
+    },
+  ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounceQuery(query), 400);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  if (error) return <PageError message={error.message} />;
+
+  return (
+    <>
+      <div className="space-y-6">
+        <PageBreadcrumb pageTitle="Reports" />
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="relative max-w-sm flex-1">
+              <Search
+                size={16}
+                // TODO: icon on dark mode not showing
+                className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-600"
+              />
+              <Input
+                placeholder="Search reports..."
+                className="pl-9"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
+            <p className="text-sm text-gray-500">{data?.total ?? 0} total</p>
+          </div>
+          <Button onClick={() => setIsModalOpen(true)} startIcon={<Plus size={16} />}>
+            Add Report
+          </Button>
+        </div>
+
+        <DataTable
+          columns={columns}
+          data={data?.data ?? []}
+          loading={isPending || isFetching}
+          emptyMessage="No reports found"
+        />
+
+        <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+      </div>
+
+      <Modal isOpen={isModalOpen} onClose={handleClose}>
+        <ReportForm editId={editId} onSuccess={handleClose} onCancel={handleClose} />
+      </Modal>
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId('')}
+        onConfirm={() => deleteReport.mutate(deleteId, { onSuccess: () => setDeleteId('') })}
+        title="Delete report"
+        message="This report will be permanently deleted. This cannot be undone."
+        confirmLabel="Delete"
+        isLoading={deleteReport.isPending}
+      />
+    </>
+  );
+}
 
 function totalAffected(r: ReportRow) {
   return (
@@ -27,128 +208,5 @@ function totalAffected(r: ReportRow) {
     (r.health_workers ?? 0) +
     (r.non_academic_staff ?? 0) +
     (r.guests ?? 0)
-  );
-}
-
-const columns: ColumnDef<ReportRow, unknown>[] = [
-  {
-    id: 'cluster',
-    header: 'Cluster',
-    accessorFn: (r) => r.cluster.name,
-    cell: ({ row: { original: r } }) => (
-      <Badge color="primary" size="sm">
-        {r.cluster.name}
-      </Badge>
-    ),
-  },
-  {
-    id: 'unit',
-    header: 'Unit',
-    accessorFn: (r) => r.unit?.name ?? '',
-    cell: ({ row: { original: r } }) => r.unit?.name ?? '—',
-  },
-  {
-    id: 'location',
-    header: 'Location',
-    accessorFn: (r) => r.location?.name ?? '',
-    cell: ({ row: { original: r } }) => (
-      <span className="max-w-50 truncate">{r.location?.name ?? '—'}</span>
-    ),
-  },
-  {
-    id: 'submitted_by',
-    header: 'Submitted By',
-    accessorFn: (r) => (r.user ? `${r.user.first_name} ${r.user.last_name}` : ''),
-    cell: ({ row: { original: r } }) => (r.user ? `${r.user.first_name} ${r.user.last_name}` : '—'),
-  },
-  {
-    id: 'total_affected',
-    header: 'Total Affected',
-    accessorFn: (r) => totalAffected(r),
-    cell: ({ row: { original: r } }) => <span className="font-medium">{totalAffected(r)}</span>,
-  },
-  {
-    id: 'casualties',
-    header: 'Casualties',
-    accessorFn: (r) => r.casualties_count ?? 0,
-    cell: ({ row: { original: r } }) =>
-      (r.casualties_count ?? 0) > 0 ? (
-        <Badge color="error" size="sm">
-          {r.casualties_count}
-        </Badge>
-      ) : (
-        <span className="text-gray-400">0</span>
-      ),
-  },
-  {
-    id: 'missing',
-    header: 'Missing',
-    accessorFn: (r) => r.missing_count ?? 0,
-    cell: ({ row: { original: r } }) =>
-      (r.missing_count ?? 0) > 0 ? (
-        <Badge color="warning" size="sm">
-          {r.missing_count}
-        </Badge>
-      ) : (
-        <span className="text-gray-400">0</span>
-      ),
-  },
-  {
-    id: 'date',
-    header: 'Date',
-    accessorFn: (r) => r.created_at ?? '',
-    cell: ({ row: { original: r } }) =>
-      r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : '—',
-  },
-];
-
-export default function ReportsPage() {
-  const [query, setQuery] = useState('');
-  const [debounceQuery, setDebounceQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const { data, isPending, isFetching, error } = useReports(page, debounceQuery);
-
-  if (error) return <PageError message={error.message} />;
-
-  const totalPages = Math.ceil((data?.total ?? 0) / PER_PAGE);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounceQuery(query), 400);
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  return (
-    <div className="space-y-6">
-      <PageBreadcrumb pageTitle="Reports" />
-
-      <div className="flex items-center gap-3">
-        <div className="relative max-w-sm flex-1">
-          <Search
-            size={16}
-            // TODO: icon on dark mode not showing
-            className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-600"
-          />
-          <Input
-            placeholder="Search reports..."
-            className="pl-9"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
-          />
-        </div>
-        <p className="text-sm text-gray-500">{data?.total ?? 0} total</p>
-      </div>
-
-      <DataTable
-        columns={columns}
-        data={data?.data ?? []}
-        loading={isPending || isFetching}
-        emptyMessage="No reports found"
-      />
-
-      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-    </div>
   );
 }

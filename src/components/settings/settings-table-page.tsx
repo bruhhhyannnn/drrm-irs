@@ -9,7 +9,7 @@ import { PageBreadcrumb } from '@/components/common';
 import type { SettingsTable } from '@/actions';
 import { toSettingsPath } from '@/lib';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, Badge, Button, Input, PageError } from '@/components/ui';
+import { DataTable, Badge, Button, Input, PageError, ConfirmDialog } from '@/components/ui';
 
 interface SettingsPageProps {
   title: string;
@@ -28,13 +28,9 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
   const [debounceQuery, setDebounceQuery] = useState('');
   const { data: items, isPending, isFetching, error } = useSettingsTable(table);
   const deleteMutation = useDeleteSetting(table);
+  const [deleteId, setDeleteId] = useState('');
 
   const basePath = toSettingsPath(title);
-
-  const handleDelete = (id: string, name: string) => {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    deleteMutation.mutate(id);
-  };
 
   const columns: ColumnDef<SettingItem, unknown>[] = [
     {
@@ -65,16 +61,17 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
       id: 'actions',
       header: 'Actions',
       cell: ({ row: { original: item } }) => (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-row items-center gap-3">
+          {/* TODO: use modals here */}
           <Link href={`${basePath}/edit/${item.id}`}>
             <button className="hover:text-brand-500 text-gray-400">
               <Pencil size={15} />
             </button>
           </Link>
           <button
-            onClick={() => handleDelete(item.id, item.name)}
-            className="hover:text-error-500 text-gray-400"
+            className="hover:text-error-500 text-gray-400 transition-all duration-100"
             disabled={deleteMutation.isPending}
+            onClick={() => setDeleteId(item.id)}
           >
             <Trash2 size={15} />
           </button>
@@ -84,42 +81,53 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
     },
   ];
 
-  if (error) return <PageError message={error.message} />;
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebounceQuery(query);
-      console.log('TEST!');
     }, 400);
     return () => clearTimeout(timer);
   }, [query]);
 
-  return (
-    <div className="space-y-6">
-      <PageBreadcrumb pageTitle={title} />
+  if (error) return <PageError message={error.message} />;
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="relative max-w-sm flex-1">
-          <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder={`Search ${title.toLowerCase()}...`}
-            className="pl-9"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+  return (
+    <>
+      <div className="space-y-6">
+        <PageBreadcrumb pageTitle={title} />
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="relative max-w-sm flex-1">
+            <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder={`Search ${title.toLowerCase()}...`}
+              className="pl-9"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <Link href={`${basePath}/create`}>
+            <Button startIcon={<Plus size={16} />}>Add {title.replace(/s$/, '')}</Button>
+          </Link>
         </div>
-        <Link href={`${basePath}/create`}>
-          <Button startIcon={<Plus size={16} />}>Add {title.replace(/s$/, '')}</Button>
-        </Link>
+
+        <DataTable
+          columns={columns}
+          data={(items ?? []) as SettingItem[]}
+          globalFilter={debounceQuery}
+          loading={isPending || isFetching}
+          emptyMessage={`No ${title.toLowerCase()} found`}
+        />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={(items ?? []) as SettingItem[]}
-        globalFilter={debounceQuery}
-        loading={isPending || isFetching}
-        emptyMessage={`No ${title.toLowerCase()} found`}
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId('')}
+        onConfirm={() => deleteMutation.mutate(deleteId, { onSuccess: () => setDeleteId('') })}
+        title="Delete report"
+        message="This report will be permanently deleted. This cannot be undone."
+        confirmLabel="Delete"
+        isLoading={deleteMutation.isPending}
       />
-    </div>
+    </>
   );
 }

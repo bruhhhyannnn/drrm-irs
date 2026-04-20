@@ -9,6 +9,7 @@ interface SidebarState {
   toggleMobileSidebar: () => void;
   setIsHovered: (val: boolean) => void;
   toggleSubmenu: (key: string) => void;
+  setOpenSubmenu: (key: string | null) => void;
   closeMobile: () => void;
 }
 
@@ -34,6 +35,8 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
     const current = get().openSubmenu;
     set({ openSubmenu: current === key ? null : key });
   },
+
+  setOpenSubmenu: (key: string | null) => set({ openSubmenu: key }),
 
   closeMobile() {
     set({ isMobileOpen: false });

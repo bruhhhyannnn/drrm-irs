@@ -10,6 +10,7 @@ export async function getEvents(query?: string) {
     include: {
       location: { select: { name: true } },
       status: { select: { name: true } },
+      _count: { select: { reports: true } },
     },
     orderBy: { created_at: 'desc' },
   });

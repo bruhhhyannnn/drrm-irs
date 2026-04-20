@@ -31,7 +31,7 @@ export function useUpdateReportMissingPerson() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: { name: string } }) =>
       updateReportMissingPerson(id, data),
-    onSuccess: (_data, _variables, context) => {
+    onSuccess: (_data, _variables) => {
       queryClient.invalidateQueries({ queryKey: ['report-missing-persons'] });
     },
   });
@@ -40,8 +40,7 @@ export function useUpdateReportMissingPerson() {
 export function useDeleteReportMissingPerson() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, reportId }: { id: string; reportId: string }) =>
-      deleteReportMissingPerson(id),
+    mutationFn: ({ id }: { id: string; reportId: string }) => deleteReportMissingPerson(id),
     onSuccess: (_data, { reportId }) => {
       queryClient.invalidateQueries({ queryKey: ['report-missing-persons', reportId] });
     },

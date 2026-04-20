@@ -4,6 +4,7 @@ export { Label } from './label';
 export { Select, Textarea } from './form';
 export { Badge } from './badge';
 export { Modal } from './modal';
+export { ConfirmDialog } from './confirm-dialog';
 export { Dropdown, DropdownItem } from './dropdown';
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './table';
 export { DataTable } from './data-table';

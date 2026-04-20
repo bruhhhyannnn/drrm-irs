@@ -31,7 +31,7 @@ export function useUpsertReportCasualty() {
 export function useDeleteReportCasualty() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, reportId }: { id: string; reportId: string }) => deleteReportCasualty(id),
+    mutationFn: ({ id }: { id: string; reportId: string }) => deleteReportCasualty(id),
     onSuccess: (_data, { reportId }) => {
       queryClient.invalidateQueries({ queryKey: ['report-casualties', reportId] });
     },

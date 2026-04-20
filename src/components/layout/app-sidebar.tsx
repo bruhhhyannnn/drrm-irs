@@ -27,8 +27,8 @@ type NavItem = {
 const navItems: NavItem[] = [
   { icon: <LayoutDashboard size={20} />, name: 'Home', path: '/' },
   { icon: <CalendarDays size={20} />, name: 'Events', path: '/events' },
-  { icon: <Calendar size={20} />, name: 'Calendar', path: '/calendar' },
   { icon: <BarChart2 size={20} />, name: 'Reports', path: '/reports' },
+  { icon: <Calendar size={20} />, name: 'Calendar', path: '/calendar' },
   { icon: <Users size={20} />, name: 'Users', path: '/users' },
   { icon: <ScrollText size={20} />, name: 'Activity Logs', path: '/activity-logs' },
   {
@@ -48,8 +48,15 @@ const navItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-  const { isExpanded, isMobileOpen, isHovered, openSubmenu, setIsHovered, toggleSubmenu } =
-    useSidebarStore();
+  const {
+    isExpanded,
+    isMobileOpen,
+    isHovered,
+    openSubmenu,
+    setIsHovered,
+    toggleSubmenu,
+    setOpenSubmenu,
+  } = useSidebarStore();
   const pathname = usePathname();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -66,11 +73,11 @@ export function AppSidebar() {
 
   // Auto-open submenu for active path
   useEffect(() => {
-    navItems.forEach((item) => {
-      if (item.subItems?.some((sub) => sub.path && pathname.startsWith(sub.path))) {
-        toggleSubmenu(item.name);
-      }
-    });
+    const activeParent = navItems.find((item) =>
+      item.subItems?.some((sub) => sub.path && pathname.startsWith(sub.path))
+    );
+
+    setOpenSubmenu(activeParent?.name ?? null);
   }, [pathname]);
 
   return (
@@ -96,8 +103,9 @@ export function AppSidebar() {
           <Image
             src="/irs-favicon.png"
             alt="IRS Logo"
-            width={64}
-            height={64}
+            width={48}
+            height={48}
+            sizes="48px"
             className="object-contain"
           />
           {isVisible && (
@@ -110,7 +118,7 @@ export function AppSidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="custom-scrollbar flex-1 overflow-y-auto px-3 py-4">
         <ul className="flex flex-col gap-1">
           {navItems.map((item) => (
             <li key={item.name}>

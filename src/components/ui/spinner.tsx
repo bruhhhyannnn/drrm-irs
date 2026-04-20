@@ -17,14 +17,20 @@ export function Spinner({ size = 'md', center = false, className }: SpinnerProps
   return (
     <div
       className={cn(
-        'relative flex items-center justify-center',
+        'relative flex animate-bounce items-center justify-center',
         center && 'mx-auto',
         sizeMap[size],
         className
       )}
     >
-      <Image src="/irs-favicon.png" alt="DRRM-H Logo" fill className="object-contain" />
-      <div className="absolute inset-0 animate-spin rounded-full bg-linear-to-tr from-30% to-white" />
+      <Image
+        src="/irs-favicon.png"
+        alt="DRRM-H Logo"
+        sizes="(max-width: 768px) 48px, 64px"
+        className="object-contain"
+        fill
+      />
+      <div className="absolute inset-0 animate-spin rounded-full bg-linear-to-tr from-35% to-white blur-xs dark:to-gray-900" />
     </div>
   );
 }

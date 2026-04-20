@@ -101,8 +101,44 @@
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gray-300) transparent;
+  }
+  html::-webkit-scrollbar {
+    width: 2px;
+  }
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  html::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray-300);
+    border-radius: 9999px;
+  }
+  .dark html {
+    scrollbar-color: var(--color-gray-800) transparent;
+  }
+  .dark html::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray-800);
+  }
   body {
-    @apply font-outfit relative bg-gray-50 font-normal;
+    @apply font-outfit bg-brand-25 relative font-normal dark:bg-gray-950;
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 2px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray-300);
+    border-radius: 9999px;
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray-800);
   }
 }
 
@@ -111,11 +147,11 @@
 }
 
 @utility menu-item-active {
-  @apply bg-brand-50 text-brand-500 dark:bg-brand-900/20 dark:text-brand-400;
+  @apply bg-brand-50 text-brand-500 dark:bg-brand-900/30 dark:text-brand-400;
 }
 
 @utility menu-item-inactive {
-  @apply text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white;
+  @apply text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-600 dark:hover:bg-white/5 dark:hover:text-white;
 }
 
 @utility menu-item-icon-active {
@@ -123,7 +159,7 @@
 }
 
 @utility menu-item-icon-inactive {
-  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-white;
+  @apply text-gray-400 group-hover:text-gray-700 dark:text-gray-600 dark:group-hover:text-white;
 }
 
 @utility menu-item-text {

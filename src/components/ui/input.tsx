@@ -26,7 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           id={id}
           required={required}
           className={cn(
-            'shadow-theme-xs h-11 w-full rounded-lg border px-4 py-2.5 text-sm transition-all duration-200 placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30',
+            'shadow-theme-xs h-11 w-full rounded-lg border-2 px-4 py-2.5 text-sm transition-all duration-200 placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30',
             error
               ? 'border-error-500 text-error-800 focus:ring-error-500/10 dark:border-error-500 dark:text-error-400'
               : success

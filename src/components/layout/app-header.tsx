@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { X, Sun, Moon, PanelRightClose, Menu } from 'lucide-react';
 import { useSidebarStore, useThemeStore } from '@/store';
 import { useAuthStore } from '@/store';
 import { Dropdown, DropdownItem } from '@/components/ui';
@@ -10,7 +10,7 @@ import { ChevronDown } from 'lucide-react';
 
 export function AppHeader() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebarStore();
+  const { isMobileOpen, isExpanded, toggleSidebar, toggleMobileSidebar } = useSidebarStore();
   const { theme, toggleTheme } = useThemeStore();
   const { user, userProfile } = useAuthStore();
 
@@ -36,7 +36,13 @@ export function AppHeader() {
           onClick={handleToggle}
           className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/5"
         >
-          {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {isMobileOpen ? (
+            <X size={20} />
+          ) : isExpanded ? (
+            <Menu size={20} />
+          ) : (
+            <PanelRightClose size={20} />
+          )}
         </button>
 
         {/* Right - actions */}

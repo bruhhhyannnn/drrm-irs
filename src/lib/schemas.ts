@@ -6,6 +6,21 @@ export const signInSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+export const updatePasswordSchema = z
+  .object({
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+// TODO: might remove this one since we dont have signup form
 export const signUpSchema = z
   .object({
     firstName: z.string().min(1, 'First name is required'),
@@ -86,9 +101,46 @@ export const damageConditionSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
+/* ─── Event ─── */
+export const eventSchema = z.object({
+  name: z.string().min(1, 'Event name is required'),
+  description: z.string().optional(),
+  quarter: z.string().optional(),
+  started_at: z.string().optional().nullable(),
+  ended_at: z.string().optional().nullable(),
+  location_id: z.string().optional().nullable(),
+  status_id: z.string().uuid('Status is required'),
+});
+
+/* ─── Report ─── */
+const headcountField = () => z.coerce.number().int().min(0).default(0);
+
+export const reportSchema = z.object({
+  event_id: z.string().uuid('Event is required'),
+  cluster_id: z.string().uuid('Cluster is required'),
+  unit_id: z.string().optional().nullable(),
+  location_id: z.string().optional().nullable(),
+  faculty_members: headcountField(),
+  admin_members: headcountField(),
+  reps_members: headcountField(),
+  ra_members: headcountField(),
+  students: headcountField(),
+  philcare_staff: headcountField(),
+  security_personnel: headcountField(),
+  construction_workers: headcountField(),
+  tenants: headcountField(),
+  health_workers: headcountField(),
+  non_academic_staff: headcountField(),
+  guests: headcountField(),
+  missing_count: headcountField(),
+  casualties_count: headcountField(),
+});
+
 /* ─── Inferred types ─── */
 export type SignInFormData = z.infer<typeof signInSchema>;
 export type SignUpFormData = z.infer<typeof signUpSchema>;
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type UpdatePasswordFormData = z.infer<typeof updatePasswordSchema>;
 export type UserCreateFormData = z.infer<typeof userCreateSchema>;
 export type UserEditFormData = z.infer<typeof userEditSchema>;
 export type UserFormData = UserCreateFormData;
@@ -100,3 +152,5 @@ export type UserTypeFormData = z.infer<typeof userTypeSchema>;
 export type EventStatusFormData = z.infer<typeof eventStatusSchema>;
 export type CasualtyConditionFormData = z.infer<typeof casualtyConditionSchema>;
 export type DamageConditionFormData = z.infer<typeof damageConditionSchema>;
+export type EventFormData = z.infer<typeof eventSchema>;
+export type ReportFormData = z.infer<typeof reportSchema>;

@@ -1,12 +1,14 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { format } from 'date-fns';
 import { useEvent, useEventReports } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import { Badge, Spinner } from '@/components/ui';
 import { CLUSTERS, HEADCOUNT_FIELDS } from '@/types';
+import { getInitials } from '@/lib';
+import type { getReportsByEvent } from '@/actions/reports';
 import {
   Users,
   MapPin,
@@ -18,8 +20,6 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { useState } from 'react';
-import type { getReportsByEvent } from '@/actions/reports';
 
 type EventReport = Awaited<ReturnType<typeof getReportsByEvent>>[number];
 
@@ -70,75 +70,69 @@ function EventDetailsContent() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <PageBreadcrumb pageTitle="Event Details" />
 
-      {/* Event header card */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-        <div className="mt-2 flex flex-wrap gap-2">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{event.name}</h1>
-          <div>
-            {event.status.name && (
-              <Badge
-                color={
-                  event.status.name === 'ongoing'
-                    ? 'success'
-                    : event.status.name === 'completed'
-                      ? 'primary'
-                      : 'warning'
-                }
-                size="sm"
-              >
-                {event.status.name}
-              </Badge>
+      <div className="space-y-3">
+        <div className="shadow-theme-sm rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
+          <div className="mt-2 flex flex-wrap gap-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{event.name}</h1>
+            <div>
+              {event.status.name && (
+                <Badge
+                  color={
+                    event.status.name === 'ongoing'
+                      ? 'success'
+                      : event.status.name === 'completed'
+                        ? 'primary'
+                        : 'warning'
+                  }
+                  size="sm"
+                >
+                  {event.status.name}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* Meta info row */}
+          <div className="mt-5 flex flex-wrap gap-4 text-sm text-gray-500">
+            {event.started_at && (
+              <div className="flex items-center gap-1.5">
+                <Calendar size={14} />
+                {format(new Date(event.started_at), 'MMM d, yyyy')}
+              </div>
+            )}
+            {event.started_at && (
+              <div className="flex items-center gap-1.5">
+                <Clock size={14} />
+                {format(new Date(event.started_at), 'h:mm a')}
+                {event.ended_at && ` — ${format(new Date(event.ended_at), 'h:mm a')}`}
+              </div>
             )}
           </div>
         </div>
 
-        {/* Meta info row */}
-        <div className="mt-5 flex flex-wrap gap-4 text-sm text-gray-500">
-          {event.location && (
-            <div className="flex items-center gap-1.5">
-              <MapPin size={14} />
-              {event.location.name}
-            </div>
-          )}
-          {event.started_at && (
-            <div className="flex items-center gap-1.5">
-              <Calendar size={14} />
-              {format(new Date(event.started_at), 'MMM d, yyyy')}
-            </div>
-          )}
-          {event.started_at && (
-            <div className="flex items-center gap-1.5">
-              <Clock size={14} />
-              {format(new Date(event.started_at), 'h:mm a')}
-              {event.ended_at && ` — ${format(new Date(event.ended_at), 'h:mm a')}`}
-            </div>
-          )}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard
+            label="Total Affected"
+            value={totalAffected.toLocaleString()}
+            icon={<Users size={16} />}
+          />
+          <StatCard label="Reports Submitted" value={totalReports} icon={<FileText size={16} />} />
+          <StatCard
+            label="Total Casualties"
+            value={totalCasualties}
+            icon={<AlertTriangle size={16} />}
+            accent={totalCasualties > 0}
+          />
+          <StatCard
+            label="Missing Persons"
+            value={totalMissing}
+            icon={<UserX size={16} />}
+            accent={totalMissing > 0}
+          />
         </div>
-      </div>
-
-      {/* Summary stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard
-          label="Total Affected"
-          value={totalAffected.toLocaleString()}
-          icon={<Users size={16} />}
-        />
-        <StatCard label="Reports Submitted" value={totalReports} icon={<FileText size={16} />} />
-        <StatCard
-          label="Total Casualties"
-          value={totalCasualties}
-          icon={<AlertTriangle size={16} />}
-          accent={totalCasualties > 0}
-        />
-        <StatCard
-          label="Missing Persons"
-          value={totalMissing}
-          icon={<UserX size={16} />}
-          accent={totalMissing > 0}
-        />
       </div>
 
       {loadingReports ? (
@@ -156,19 +150,11 @@ function EventDetailsContent() {
             <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
               Reports by Cluster
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {activeClusters.map((cluster) => (
                 <ClusterCard key={cluster} cluster={cluster} reports={reportsByCluster[cluster]} />
               ))}
             </div>
-          </div>
-
-          {/* University grand total */}
-          <div>
-            <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
-              University Total
-            </h2>
-            <GrandTotalCard reports={reports} />
           </div>
 
           {/* Pending clusters — clusters with no reports */}
@@ -181,16 +167,24 @@ function EventDetailsContent() {
                 {pendingClusters.map((cluster) => (
                   <div
                     key={cluster}
-                    className="flex items-center gap-2 rounded-lg border border-dashed border-gray-200 px-4 py-2.5 text-sm text-gray-400 dark:border-white/10"
+                    className="flex flex-1 items-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-2.5 text-sm text-gray-500 dark:border-white/10 dark:text-gray-400"
                   >
-                    <div className="h-1.5 w-1.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
                     {cluster}
-                    <span className="text-xs text-gray-300 dark:text-gray-600">no reports</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">no reports</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* University grand total */}
+          <div>
+            <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              University Total
+            </h2>
+            <GrandTotalCard reports={reports} />
+          </div>
         </>
       )}
     </div>
@@ -211,9 +205,9 @@ function StatCard({
 }) {
   return (
     <div
-      className={`rounded-xl border p-4 ${
+      className={`shadow-theme-sm rounded-xl border p-4 ${
         accent
-          ? 'border-error-200 bg-error-50 dark:border-error-500/20 dark:bg-error-500/10'
+          ? 'border-error-200 bg-error-100 dark:border-error-500/20 dark:bg-error-500/10'
           : 'border-gray-200 bg-white dark:border-white/5 dark:bg-white/3'
       }`}
     >
@@ -268,12 +262,12 @@ function ClusterCard({ cluster, reports }: { cluster: string; reports: EventRepo
   const hasMissing = totals.missing_count > 0;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+    <div className="shadow-theme-md overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
       {/* Cluster header */}
       <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/5 dark:bg-white/2">
         <div className="flex items-center gap-3">
           <div className="bg-brand-500 flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white">
-            {cluster.slice(0, 2).toUpperCase()}
+            {getInitials(cluster)}
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900 dark:text-white">{cluster}</p>
@@ -440,7 +434,7 @@ function GrandTotalCard({ reports }: { reports: EventReport[] }) {
   const totalAffected = HEADCOUNT_FIELDS.reduce((sum, { key }) => sum + (grandTotals[key] ?? 0), 0);
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+    <div className="shadow-theme-md rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
       <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/5 dark:bg-white/2">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-gray-900 dark:text-white">University Total</p>

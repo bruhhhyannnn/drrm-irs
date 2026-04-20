@@ -35,12 +35,12 @@ export default function ActivityLogsPage() {
 
   const totalPages = Math.ceil((data?.total ?? 0) / PER_PAGE);
 
-  if (error) return <PageError message={error.message} />;
-
   useEffect(() => {
     const timer = setTimeout(() => setDebounceQuery(query), 400);
     return () => clearTimeout(timer);
   }, [query]);
+
+  if (error) return <PageError message={error.message} />;
 
   return (
     <div className="space-y-6">
