@@ -8,6 +8,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { SignInFormData, signInSchema, supabase } from '@/lib';
 import { useAuthStore } from '@/store';
 import { Button, Input, Label } from '@/components/ui';
+import Link from 'next/link';
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -100,6 +101,15 @@ export function SignInForm() {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+        </div>
+
+        <div className="flex justify-center">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-gray-500 transition-all duration-200 hover:text-gray-800 dark:hover:text-gray-200"
+          >
+            Forgot password?
+          </Link>
         </div>
 
         <Button
