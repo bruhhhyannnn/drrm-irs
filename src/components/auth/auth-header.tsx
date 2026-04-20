@@ -1,16 +1,39 @@
+'use client';
+
+import { cn } from '@/lib';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export function AuthHeader({ children }: { children: React.ReactNode }) {
+  const BG_IMAGES = [
+    '/upm-drrmh-background-1.jpg',
+    '/upm-drrmh-background-2.jpg',
+    '/upm-drrmh-background-3.jpg',
+    '/upm-drrmh-background-4.jpg',
+  ];
+  const track = [...BG_IMAGES, ...BG_IMAGES]; // doubled for seamless loop
+  const [current, setCurrent] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % track.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [track.length]);
+
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4">
-      <div className="absolute inset-0">
-        <Image
-          src="/upm-drrmh-background.jpg"
-          alt="UP Manila DRRM-H Background"
-          fill
-          className="object-cover"
-          priority
-        />
+      <div className="absolute inset-0 overflow-hidden">
+        {track.map((src, i) => (
+          <div
+            key={i}
+            className={cn(
+              'absolute inset-0 transition-opacity duration-1000',
+              i === current ? 'opacity-100' : 'opacity-0'
+            )}
+          >
+            <Image src={src} alt="" fill className="object-cover" priority={i === 0} />
+          </div>
+        ))}
         <div className="bg-brand-900/60 absolute inset-0" />
       </div>
       <div className="shadow-theme-md z-1 w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 dark:border-gray-800 dark:bg-gray-900">
