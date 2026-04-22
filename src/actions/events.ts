@@ -32,6 +32,22 @@ export async function createEvent(data: Prisma.EventCreateInput) {
   return event;
 }
 
+export async function getEventForEdit(id: string) {
+  return prisma.event.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      quarter: true,
+      started_at: true,
+      ended_at: true,
+      location_id: true,
+      status_id: true,
+    },
+  });
+}
+
 export async function updateEvent(id: string, data: Prisma.EventUpdateInput) {
   const event = await prisma.event.update({
     where: { id },

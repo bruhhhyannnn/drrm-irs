@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Search, Eye, Plus } from 'lucide-react';
+import { Search, Eye, Plus, Pencil } from 'lucide-react';
 import { useEvents } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import {
@@ -88,9 +88,9 @@ export default function EventsPage() {
                 <TableCell>
                   <Badge
                     color={
-                      event.status.name === 'active'
+                      event.status.name.toLocaleLowerCase() === 'active'
                         ? 'success'
-                        : event.status.name === 'completed'
+                        : event.status.name.toLocaleLowerCase() === 'completed'
                           ? 'primary'
                           : 'warning'
                     }
@@ -100,13 +100,23 @@ export default function EventsPage() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Link
-                    href={`/events/details?id=${event.id}`}
-                    className="hover:text-brand-600 inline-flex items-center gap-1.5 text-sm text-gray-400 transition-all duration-100"
-                  >
-                    <Eye size={14} />
-                    View
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setEditId(event.id);
+                        setIsModalOpen(true);
+                      }}
+                      className="hover:text-brand-600 inline-flex items-center gap-1.5 text-sm text-gray-400 transition-all duration-100"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <Link
+                      href={`/events/details?id=${event.id}`}
+                      className="hover:text-brand-600 inline-flex items-center gap-1.5 text-sm text-gray-400 transition-all duration-100"
+                    >
+                      <Eye size={14} />
+                    </Link>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
