@@ -1,15 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { useSettingsTable, useDeleteSetting } from '@/hooks';
 import { PageBreadcrumb } from '@/components/common';
 import type { SettingsTable } from '@/actions';
-import { toSettingsPath } from '@/lib';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, Badge, Button, Input, PageError, ConfirmDialog } from '@/components/ui';
+import { DataTable, Badge, Button, Input, PageError, ConfirmDialog, Modal } from '@/components/ui';
+import { SettingsForm } from '@/components/settings';
 
 interface SettingsPageProps {
   title: string;
@@ -29,8 +28,18 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
   const { data: items, isPending, isFetching, error } = useSettingsTable(table);
   const deleteMutation = useDeleteSetting(table);
   const [deleteId, setDeleteId] = useState('');
+  const [editId, setEditId] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const basePath = toSettingsPath(title);
+  const handleOpen = (id = '') => {
+    setEditId(id);
+    setIsModalOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setEditId('');
+  };
 
   const columns: ColumnDef<SettingItem, unknown>[] = [
     {
@@ -62,12 +71,12 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
       header: 'Actions',
       cell: ({ row: { original: item } }) => (
         <div className="flex flex-row items-center gap-3">
-          {/* TODO: use modals here */}
-          <Link href={`${basePath}/edit/${item.id}`}>
-            <button className="hover:text-brand-500 text-gray-400">
-              <Pencil size={15} />
-            </button>
-          </Link>
+          <button
+            className="hover:text-brand-500 text-gray-400"
+            onClick={() => handleOpen(item.id)}
+          >
+            <Pencil size={15} />
+          </button>
           <button
             className="hover:text-error-500 text-gray-400 transition-all duration-100"
             disabled={deleteMutation.isPending}
@@ -82,9 +91,7 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
   ];
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebounceQuery(query);
-    }, 400);
+    const timer = setTimeout(() => setDebounceQuery(query), 400);
     return () => clearTimeout(timer);
   }, [query]);
 
@@ -105,9 +112,9 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <Link href={`${basePath}/create`}>
-            <Button startIcon={<Plus size={16} />}>Add {title.replace(/s$/, '')}</Button>
-          </Link>
+          <Button onClick={() => handleOpen()} startIcon={<Plus size={16} />}>
+            Add {title.replace(/s$/, '')}
+          </Button>
         </div>
 
         <DataTable
@@ -119,12 +126,22 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
         />
       </div>
 
+      <Modal isOpen={isModalOpen} onClose={handleClose}>
+        <SettingsForm
+          title={title}
+          table={table}
+          editId={editId}
+          onSuccess={handleClose}
+          onCancel={handleClose}
+        />
+      </Modal>
+
       <ConfirmDialog
         isOpen={!!deleteId}
         onClose={() => setDeleteId('')}
         onConfirm={() => deleteMutation.mutate(deleteId, { onSuccess: () => setDeleteId('') })}
-        title="Delete report"
-        message="This report will be permanently deleted. This cannot be undone."
+        title={`Delete ${title.replace(/s$/, '').toLowerCase()}`}
+        message="This item will be permanently deleted. This cannot be undone."
         confirmLabel="Delete"
         isLoading={deleteMutation.isPending}
       />
