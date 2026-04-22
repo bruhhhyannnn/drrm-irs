@@ -103,9 +103,9 @@ export default function DashboardPage() {
                 </div>
                 <Badge
                   color={
-                    event.status.name === 'ongoing'
+                    event.status.name.toLocaleLowerCase() === 'ongoing'
                       ? 'success'
-                      : event.status.name === 'completed'
+                      : event.status.name.toLocaleLowerCase() === 'completed'
                         ? 'primary'
                         : 'warning'
                   }
@@ -143,7 +143,7 @@ export default function DashboardPage() {
                   {statusData.map((entry) => (
                     <Cell
                       key={entry.name}
-                      fill={STATUS_COLORS[entry.name] ?? STATUS_COLORS.Unknown}
+                      fill={STATUS_COLORS[entry.name.toLocaleLowerCase()] ?? STATUS_COLORS.Unknown}
                     />
                   ))}
                 </Pie>

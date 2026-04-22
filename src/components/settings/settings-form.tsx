@@ -1,104 +1,151 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCreateSetting, useUpdateSetting, useSettingsTable } from '@/hooks';
-import { PageBreadcrumb } from '@/components/common';
-import { Input, Label, Button } from '@/components/ui';
+import { Input, Label, Button, Select } from '@/components/ui';
 import type { SettingsTable } from '@/actions';
-import { toSettingsPath } from '@/lib';
+import {
+  clusterSchema,
+  unitSchema,
+  locationSchema,
+  positionSchema,
+  userTypeSchema,
+  eventStatusSchema,
+  casualtyConditionSchema,
+  damageConditionSchema,
+} from '@/lib';
 
-const schema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  isActive: z.boolean().default(true),
-});
+const SCHEMA_MAP = {
+  clusters: clusterSchema,
+  units: unitSchema,
+  locations: locationSchema,
+  positions: positionSchema,
+  user_types: userTypeSchema,
+  event_statuses: eventStatusSchema,
+  casualty_conditions: casualtyConditionSchema,
+  damage_conditions: damageConditionSchema,
+} as const;
 
-type FormData = z.infer<typeof schema>;
+// Tables that require a cluster_id foreign key
+const NEEDS_CLUSTER: SettingsTable[] = ['units', 'locations'];
+
+type AnyFormData = z.infer<(typeof SCHEMA_MAP)[SettingsTable]>;
 
 interface SettingsFormProps {
   title: string;
   table: SettingsTable;
   editId?: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-export function SettingsForm({ title, table, editId }: SettingsFormProps) {
-  const router = useRouter();
+export function SettingsForm({ title, table, editId, onSuccess, onCancel }: SettingsFormProps) {
   const isEdit = !!editId;
-  const basePath = toSettingsPath(title);
+  const needsCluster = NEEDS_CLUSTER.includes(table);
 
   const { data: items } = useSettingsTable(table);
+  const { data: clusters = [] } = useSettingsTable('clusters');
   const createMutation = useCreateSetting(table);
   const updateMutation = useUpdateSetting(table);
+
+  const schema = SCHEMA_MAP[table];
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<AnyFormData>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (isEdit && items) {
       const item = items.find((i: Record<string, unknown>) => i.id === editId);
-      if (item) reset({ name: String(item.name ?? ''), isActive: Boolean(item.is_active) });
+      if (item) {
+        reset({
+          name: String(item.name ?? ''),
+          is_active: Boolean(item.is_active),
+          ...(needsCluster && { cluster_id: String(item.cluster_id ?? '') }),
+        } as AnyFormData);
+      }
     }
-  }, [isEdit, items, editId, reset]);
+  }, [isEdit, items, editId, reset, needsCluster]);
 
-  const onSubmit = async (data: FormData) => {
-    const payload = { name: data.name, isActive: data.isActive };
+  const onSubmit = async (data: AnyFormData) => {
     if (isEdit) {
-      await updateMutation.mutateAsync({ id: editId!, data: payload });
+      await updateMutation.mutateAsync({ id: editId!, data });
     } else {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync(data);
     }
-    router.push(basePath);
+    onSuccess?.();
   };
+
+  const singularTitle = title.replace(/s$/, '');
+  const clusterOptions = (clusters as { id: string; name: string }[]).map((c) => ({
+    value: c.id,
+    label: c.name,
+  }));
+
+  const nameError = (errors as Record<string, { message?: string }>).name;
+  const clusterError = (errors as Record<string, { message?: string }>).cluster_id;
 
   return (
     <div className="space-y-6">
-      <PageBreadcrumb pageTitle={`${isEdit ? 'Edit' : 'Add'} ${title.replace(/s$/, '')}`} />
+      <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+        {isEdit ? 'Edit' : 'Add'} {singularTitle}
+      </h4>
 
-      <div className="max-w-lg rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div>
+          <Label required>Name</Label>
+          <Input
+            placeholder={`Enter ${singularTitle.toLowerCase()} name`}
+            error={!!nameError}
+            hint={nameError?.message}
+            {...register('name')}
+          />
+        </div>
+
+        {needsCluster && (
           <div>
-            <Label required>Name</Label>
-            <Input
-              placeholder={`Enter ${title.replace(/s$/, '').toLowerCase()} name`}
-              error={!!errors.name}
-              hint={errors.name?.message}
-              {...register('name')}
+            <Label required>Cluster</Label>
+            <Select
+              options={clusterOptions}
+              placeholder="Select cluster..."
+              error={!!clusterError}
+              hint={clusterError?.message}
+              {...register('cluster_id')}
             />
           </div>
+        )}
 
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="isActive"
-              {...register('isActive')}
-              className="h-4 w-4 rounded border-gray-300"
-            />
-            <Label htmlFor="isActive" className="mb-0">
-              Active
-            </Label>
-          </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="is_active"
+            {...register('is_active')}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="is_active" className="mb-0">
+            Active
+          </Label>
+        </div>
 
-          <div className="flex items-center gap-3 pt-2">
-            <Button
-              type="submit"
-              isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending}
-              loadingText="Saving..."
-            >
-              {isEdit ? 'Update' : 'Create'}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => router.push(basePath)}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </div>
+        <div className="flex items-center gap-3 pt-2">
+          <Button
+            type="submit"
+            isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending}
+            loadingText="Saving..."
+          >
+            {isEdit ? 'Update' : 'Create'}
+          </Button>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
