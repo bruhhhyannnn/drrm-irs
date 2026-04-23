@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib';
 import Image from 'next/image';
+import { version } from '../../../package.json';
 
 type NavItem = {
   name: string;
@@ -207,8 +208,9 @@ export function AppSidebar() {
 
       {/* Footer */}
       {isVisible && (
-        <div className="border-t border-gray-200 p-4 dark:border-gray-800">
-          <p className="text-center text-xs text-gray-400">UP Manila DRRM-H © 2026</p>
+        <div className="flex flex-col border-t border-gray-200 p-4 dark:border-gray-800">
+          <p className="text-center text-xs text-gray-500">UP Manila DRRM-H © 2026</p>
+          <p className="text-center text-xs text-gray-400 dark:text-gray-600">Version {version}</p>
         </div>
       )}
     </aside>
