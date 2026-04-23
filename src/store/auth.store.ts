@@ -1,16 +1,24 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, Session } from '@supabase/supabase-js';
-import { User as UserProfile } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
+//DEV NOTE: This is needed for the userProfile type to work
+export type UserProfileType = Prisma.UserGetPayload<{
+  include: {
+    unit: { include: { cluster: true } };
+    position: true;
+    user_type: true;
+  };
+}>;
 interface AuthState {
   user: User | null;
   session: Session | null;
-  userProfile: UserProfile | null;
+  userProfile: UserProfileType | null;
   loading: boolean;
   setUser: (user: User | null) => void;
   setSession: (session: Session | null) => void;
-  setUserProfile: (profile: UserProfile | null) => void;
+  setUserProfile: (profile: UserProfileType | null) => void;
   setLoading: (loading: boolean) => void;
   reset: () => void;
 }
@@ -31,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
         set({ session });
       },
 
-      setUserProfile(userProfile: UserProfile | null) {
+      setUserProfile(userProfile: UserProfileType | null) {
         set({ userProfile });
       },
 

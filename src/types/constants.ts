@@ -200,3 +200,5 @@ export const USER_TYPES = {
   2: 'Administrator',
   3: 'Super Admin',
 } as const;
+
+export const FORBIDDEN_USER_TYPES = ['ERT Member', 'Bystander']
