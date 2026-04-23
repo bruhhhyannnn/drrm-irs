@@ -9,17 +9,7 @@ import { Badge, Spinner } from '@/components/ui';
 import { CLUSTERS, HEADCOUNT_FIELDS } from '@/types';
 import { getInitials } from '@/lib';
 import type { getReportsByEvent } from '@/actions/reports';
-import {
-  Users,
-  MapPin,
-  Calendar,
-  Clock,
-  AlertTriangle,
-  UserX,
-  FileText,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { Users, MapPin, Calendar, Clock, AlertTriangle, UserX, FileText } from 'lucide-react';
 
 type EventReport = Awaited<ReturnType<typeof getReportsByEvent>>[number];
 
@@ -243,7 +233,12 @@ function HeadcountRow({ label, value }: { label: string; value: number }) {
 
 // ─── Cluster board card ───────────────────────────────────
 function ClusterCard({ cluster, reports }: { cluster: string; reports: EventReport[] }) {
-  const [expanded, setExpanded] = useState(false);
+  const units = Array.from(new Set(reports.map((r) => r.unit?.name).filter(Boolean))) as string[];
+
+  const [selectedUnit, setSelectedUnit] = useState<string | null>(units[0] ?? null);
+  const filteredReports = selectedUnit
+    ? reports.filter((r) => r.unit?.name === selectedUnit)
+    : reports;
 
   const totals = reports.reduce(
     (acc, r) => {
@@ -305,114 +300,110 @@ function ClusterCard({ cluster, reports }: { cluster: string; reports: EventRepo
         </div>
       </div>
 
-      {/* Expandable individual reports */}
-      {reports.length > 0 && (
-        <>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex w-full items-center justify-between border-t border-gray-100 px-5 py-3 text-xs font-medium text-gray-500 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/2"
+      {/* Unit pill filters */}
+      {units.length > 0 && (
+        <div className="flex flex-wrap gap-2 border-t border-gray-100 px-5 py-3 dark:border-white/5">
+          {units.map((unit) => (
+            <button
+              key={unit}
+              onClick={() => setSelectedUnit(selectedUnit === unit ? null : unit)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 ${
+                selectedUnit === unit
+                  ? 'border-brand-500 bg-brand-500 text-white'
+                  : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:border-white/10 dark:bg-white/3 dark:text-gray-400 dark:hover:border-white/20 dark:hover:text-gray-200'
+              }`}
+            >
+              {unit}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Individual reports — always visible, filtered by selected unit */}
+      <div className="border-t border-gray-100 dark:border-white/5">
+        {filteredReports.map((r, i) => (
+          <div
+            key={r.id}
+            className={`px-5 py-4 ${i !== filteredReports.length - 1 ? 'border-b border-gray-100 dark:border-white/5' : ''}`}
           >
-            <span>Individual reports ({reports.length})</span>
-            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
+            <div className="mb-3 flex items-start justify-between gap-2">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {r.user ? `${r.user.first_name} ${r.user.last_name}` : '—'}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {r.unit?.name || '—'} · {r.user?.position?.name || '—'}
+                </p>
+              </div>
+              <div className="flex gap-1.5">
+                {(r.casualties_count ?? 0) > 0 && (
+                  <Badge color="error" size="sm">
+                    {r.casualties_count} casualties
+                  </Badge>
+                )}
+                {(r.missing_count ?? 0) > 0 && (
+                  <Badge color="warning" size="sm">
+                    {r.missing_count} missing
+                  </Badge>
+                )}
+              </div>
+            </div>
 
-          {expanded && (
-            <div className="border-t border-gray-100 dark:border-white/5">
-              {reports.map((r, i) => (
-                <div
-                  key={r.id}
-                  className={`px-5 py-4 ${i !== reports.length - 1 ? 'border-b border-gray-100 dark:border-white/5' : ''}`}
-                >
-                  <div className="mb-3 flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {r.user ? `${r.user.first_name} ${r.user.last_name}` : '—'}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {r.unit?.name || '—'} · {r.user?.position?.name || '—'}
-                      </p>
-                    </div>
-                    <div className="flex gap-1.5">
-                      {(r.casualties_count ?? 0) > 0 && (
-                        <Badge color="error" size="sm">
-                          {r.casualties_count} casualties
-                        </Badge>
-                      )}
-                      {(r.missing_count ?? 0) > 0 && (
-                        <Badge color="warning" size="sm">
-                          {r.missing_count} missing
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Mini headcount grid */}
-                  <div className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
-                    {HEADCOUNT_FIELDS.filter(({ key }) => (r as any)[key] > 0).map(
-                      ({ key, label }) => (
-                        <div
-                          key={key}
-                          className="rounded-lg bg-gray-50 px-2 py-1.5 dark:bg-white/3"
-                        >
-                          <p className="text-xs text-gray-400">{label}</p>
-                          <p className="text-sm font-semibold text-gray-900 tabular-nums dark:text-white">
-                            {(r as any)[key]}
-                          </p>
-                        </div>
-                      )
-                    )}
-                  </div>
-
-                  {/* Incident details */}
-                  {(r.missing_persons.length > 0 ||
-                    r.casualties.length > 0 ||
-                    r.damages.length > 0) && (
-                    <div className="mt-3 space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3 text-xs dark:border-white/5 dark:bg-white/2">
-                      {r.missing_persons.length > 0 && (
-                        <div>
-                          <span className="text-warning-600 dark:text-warning-400 font-medium">
-                            Missing:{' '}
-                          </span>
-                          <span className="text-gray-600 dark:text-gray-300">
-                            {r.missing_persons.map((p) => p.name).join(', ')}
-                          </span>
-                        </div>
-                      )}
-                      {r.casualties.length > 0 && (
-                        <div>
-                          <span className="text-error-600 dark:text-error-400 font-medium">
-                            Casualties:{' '}
-                          </span>
-                          <span className="text-gray-600 dark:text-gray-300">
-                            {r.casualties.map((c) => `${c.condition.name} (${c.count})`).join(', ')}
-                          </span>
-                        </div>
-                      )}
-                      {r.damages.length > 0 && (
-                        <div>
-                          <span className="font-medium text-gray-600 dark:text-gray-300">
-                            Damage:{' '}
-                          </span>
-                          <span className="text-gray-600 dark:text-gray-300">
-                            {r.damages.map((d) => d.damage_report.name).join(', ')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {r.location?.name && (
-                    <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
-                      <MapPin size={11} />
-                      {r.location.name}
-                    </div>
-                  )}
+            {/* Mini headcount grid */}
+            <div className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+              {HEADCOUNT_FIELDS.filter(({ key }) => (r as any)[key] > 0).map(({ key, label }) => (
+                <div key={key} className="rounded-lg bg-gray-50 px-2 py-1.5 dark:bg-white/3">
+                  <p className="text-xs text-gray-400">{label}</p>
+                  <p className="text-sm font-semibold text-gray-900 tabular-nums dark:text-white">
+                    {(r as any)[key]}
+                  </p>
                 </div>
               ))}
             </div>
-          )}
-        </>
-      )}
+
+            {/* Incident details */}
+            {(r.missing_persons.length > 0 || r.casualties.length > 0 || r.damages.length > 0) && (
+              <div className="mt-3 space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3 text-xs dark:border-white/5 dark:bg-white/2">
+                {r.missing_persons.length > 0 && (
+                  <div>
+                    <span className="text-warning-600 dark:text-warning-400 font-medium">
+                      Missing:{' '}
+                    </span>
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {r.missing_persons.map((p) => p.name).join(', ')}
+                    </span>
+                  </div>
+                )}
+                {r.casualties.length > 0 && (
+                  <div>
+                    <span className="text-error-600 dark:text-error-400 font-medium">
+                      Casualties:{' '}
+                    </span>
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {r.casualties.map((c) => `${c.condition.name} (${c.count})`).join(', ')}
+                    </span>
+                  </div>
+                )}
+                {r.damages.length > 0 && (
+                  <div>
+                    <span className="font-medium text-gray-600 dark:text-gray-300">Damage: </span>
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {r.damages.map((d) => d.damage_report.name).join(', ')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {r.location?.name && (
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
+                <MapPin size={11} />
+                {r.location.name}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
