@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/lib';
 import { useAuthStore } from '@/store';
 import { getUserByAuthId } from '@/actions';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setSession, setUserProfile, setLoading } = useAuthStore();
+  const lastUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -23,8 +24,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
-      else {
+
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        lastUserIdRef.current = null;
         setUserProfile(null);
         setLoading(false);
       }
@@ -34,7 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function fetchProfile(userId: string) {
+    if (lastUserIdRef.current === userId) return;
+    lastUserIdRef.current = userId;
+
     setLoading(true);
+    setUserProfile(null);
     try {
       const user = await getUserByAuthId(userId);
       setUserProfile(user ?? null);

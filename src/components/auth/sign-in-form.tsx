@@ -26,10 +26,15 @@ export function SignInForm() {
     resolver: zodResolver(signInSchema),
   });
 
+  // Only redirect if not an unauthorized error
   useEffect(() => {
-    if (user) router.push(redirectTo);
-  }, [user, router, redirectTo]);
+    const errorParam = searchParams?.get('error');
+    if (user && errorParam !== 'unauthorized') {
+      router.push(redirectTo);
+    }
+  }, [user, router, redirectTo, searchParams]);
 
+  // Show error message once, then clear query params
   useEffect(() => {
     const errorParam = searchParams?.get('error');
     const messageParam = searchParams?.get('message');
@@ -38,7 +43,7 @@ export function SignInForm() {
       const timer = setTimeout(() => router.replace('/signin'), 3000);
       return () => clearTimeout(timer);
     }
-  }, [searchParams, router]);
+  }, []); // run once only
 
   const onSubmit = async (data: SignInFormData) => {
     setAuthError('');
