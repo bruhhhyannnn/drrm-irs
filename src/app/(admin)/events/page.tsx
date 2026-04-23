@@ -46,8 +46,8 @@ export default function EventsPage() {
       <div className="space-y-6">
         <PageBreadcrumb pageTitle="Events" />
 
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative max-w-sm flex-1">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="relative max-w-sm min-w-2xs flex-1">
             <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
             <Input
               placeholder="Search events..."
@@ -108,13 +108,13 @@ export default function EventsPage() {
                       }}
                       className="hover:text-brand-600 inline-flex items-center gap-1.5 text-sm text-gray-400 transition-all duration-100"
                     >
-                      <Pencil size={14} />
+                      <Pencil size={17} />
                     </button>
                     <Link
                       href={`/events/details?id=${event.id}`}
                       className="hover:text-brand-600 inline-flex items-center gap-1.5 text-sm text-gray-400 transition-all duration-100"
                     >
-                      <Eye size={14} />
+                      <Eye size={17} />
                     </Link>
                   </div>
                 </TableCell>

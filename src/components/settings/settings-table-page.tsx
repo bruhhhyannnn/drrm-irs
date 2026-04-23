@@ -75,14 +75,14 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
             className="hover:text-brand-500 text-gray-400"
             onClick={() => handleOpen(item.id)}
           >
-            <Pencil size={15} />
+            <Pencil size={17} />
           </button>
           <button
             className="hover:text-error-500 text-gray-400 transition-all duration-100"
             disabled={deleteMutation.isPending}
             onClick={() => setDeleteId(item.id)}
           >
-            <Trash2 size={15} />
+            <Trash2 size={17} />
           </button>
         </div>
       ),
@@ -102,8 +102,8 @@ export function SettingsTablePage({ title, table }: SettingsPageProps) {
       <div className="space-y-6">
         <PageBreadcrumb pageTitle={title} />
 
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative max-w-sm flex-1">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="relative max-w-sm min-w-2xs flex-1">
             <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
             <Input
               placeholder={`Search ${title.toLowerCase()}...`}

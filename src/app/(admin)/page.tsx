@@ -18,6 +18,7 @@ import {
 } from 'recharts';
 import { CalendarDays, FileText, Users, AlertTriangle } from 'lucide-react';
 import { useEvents, useReports, useUsers, useReportClusterSummary } from '@/hooks';
+import Link from 'next/link';
 
 const CLUSTER_COLOR = '#a11d1d';
 
@@ -91,9 +92,10 @@ export default function DashboardPage() {
           </h3>
           <div className="space-y-3">
             {events?.map((event) => (
-              <div
+              <Link
                 key={event.id}
-                className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 dark:bg-white/2"
+                href={`/events/details?id=${event.id}`}
+                className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 transition-colors hover:bg-gray-100 dark:bg-white/2 dark:hover:bg-white/5"
               >
                 <div>
                   <p className="text-sm font-medium text-gray-800 dark:text-white">{event.name}</p>
@@ -113,7 +115,7 @@ export default function DashboardPage() {
                 >
                   {event.status.name}
                 </Badge>
-              </div>
+              </Link>
             ))}
             {!events?.length && (
               <div className="flex h-60 items-center justify-center">

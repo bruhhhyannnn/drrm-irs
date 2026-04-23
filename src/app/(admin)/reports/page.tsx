@@ -116,13 +116,13 @@ export default function ReportsPage() {
               setEditId(r.id);
             }}
           >
-            <Pencil size={15} />
+            <Pencil size={17} />
           </button>
           <button
             className="hover:text-error-500 text-gray-400 transition-all duration-100"
             onClick={() => setDeleteId(r.id)}
           >
-            <Trash2 size={15} />
+            <Trash2 size={17} />
           </button>
         </div>
       ),
@@ -142,7 +142,7 @@ export default function ReportsPage() {
       <div className="space-y-6">
         <PageBreadcrumb pageTitle="Reports" />
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="relative max-w-sm flex-1">
               <Search

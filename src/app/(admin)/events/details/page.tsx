@@ -310,7 +310,7 @@ function ClusterCard({ cluster, reports }: { cluster: string; reports: EventRepo
               className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 ${
                 selectedUnit === unit
                   ? 'border-brand-500 bg-brand-500 text-white'
-                  : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:border-white/10 dark:bg-white/3 dark:text-gray-400 dark:hover:border-white/20 dark:hover:text-gray-200'
+                  : 'border-gray-200 bg-white text-gray-500 hover:border-gray-400 hover:text-gray-800 dark:border-white/10 dark:bg-white/3 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-100'
               }`}
             >
               {unit}
