@@ -7,6 +7,7 @@ import {
   updateReport,
   deleteReport,
   getReportClusterSummary,
+  getReportTotals,
 } from '@/actions/reports';
 import type { Prisma, Report } from '@prisma/client';
 
@@ -83,4 +84,11 @@ export function useTotalAffected(report: Report): number {
     (report.non_academic_staff ?? 0) +
     (report.guests ?? 0)
   );
+}
+
+export function useReportTotals() {
+  return useQuery({
+    queryKey: ['report-totals'],
+    queryFn: () => getReportTotals(),
+  });
 }

@@ -135,3 +135,16 @@ export async function getReportClusterSummary() {
     missing: r._sum.missing_count ?? 0,
   }));
 }
+
+export async function getReportTotals() {
+  const result = await prisma.report.aggregate({
+    _count: { id: true },
+    _sum: { casualties_count: true, missing_count: true },
+  });
+
+  return {
+    reports: result._count.id,
+    casualties: result._sum.casualties_count ?? 0,
+    missing: result._sum.missing_count ?? 0,
+  };
+}
