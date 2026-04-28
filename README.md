@@ -553,6 +553,8 @@ npm run lint:fix   # Auto-fix ESLint issues
 
 **Bryan Mangapit** — Lead Developer
 [bruhhhyannnn.framer.website](https://bruhhhyannnn.framer.website) · [GitHub](https://github.com/bruhhhyannnn) · [LinkedIn](https://linkedin.com/in/bryanmangapit)
+**Yoshilyn Fujitani** — Lead Developer
+[yoshilyn.netlify.app](https://yoshilyn.netlify.app) · [GitHub](https://github.com/yoshilynfujitani) · [LinkedIn](https://linkedin.com/in/yoshilyn-fujitani)
 
 ---
 
