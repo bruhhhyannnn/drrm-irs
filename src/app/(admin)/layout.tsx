@@ -20,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Backdrop />
         <div className={`flex-1 transition-all duration-300 ease-in-out ${marginLeft}`}>
           <AppHeader />
-          <div className="mx-auto max-w-screen-2xl bg-gray-50 p-4 md:p-6">{children}</div>
+          <div className="mx-auto max-w-screen-2xl p-4 md:p-6">{children}</div>
         </div>
       </div>
     </ProtectedRoute>

@@ -57,11 +57,10 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-4 pb-4">
       <PageBreadcrumb pageTitle="Dashboard" />
 
-      {/* Main Layout Grid - Adjusted for Viewport Height on Desktop */}
       <div className="flex flex-col gap-4 xl:h-[calc(100vh-240px)] xl:flex-row">
-        {/* LEFT COLUMN: Stats & Graphs */}
-        <div className="flex w-full flex-col gap-4 xl:h-full xl:w-2/3">
-          {/* Stats: 2x2 Grid */}
+        {/* LEFT COLUMN */}
+        <div className="flex w-full flex-col gap-4 xl:w-2/3">
+          {/* Stats grid — 2 cols on sm+, 4 on xl */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <StatCard
               title="Total Events"
@@ -75,7 +74,7 @@ export default function DashboardPage() {
               value={stats?.reports ?? '—'}
               icon={<FileText size={20} />}
               color="success"
-              trend="Reports from all cluster"
+              trend="Reports from all clusters"
             />
             <StatCard
               title="Total Users"
@@ -97,19 +96,19 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="grid min-h-70 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
+          {/* Charts */}
+          <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
             {/* Events by Status */}
-            <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-gray-900/50">
+            <div className="flex min-h-72 flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-gray-900">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Events by Status
+                  Events by status
                 </h3>
-                <Activity className="text-gray-400" size={16} />
+                <Activity className="text-gray-400 dark:text-gray-500" size={16} />
               </div>
-
-              <div className="flex-1">
+              <div className="flex flex-1 items-center justify-center">
                 {statusData.length ? (
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
                       <Pie
                         data={statusData}
@@ -133,11 +132,10 @@ export default function DashboardPage() {
                       </Pie>
                       <Tooltip
                         contentStyle={{
-                          background: 'rgba(17, 24, 39, 0.95)',
+                          background: 'rgba(17,24,39,0.95)',
                           border: 'none',
                           borderRadius: '8px',
                           color: '#f9fafb',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                           fontSize: '12px',
                         }}
                         itemStyle={{ color: '#fff' }}
@@ -146,7 +144,7 @@ export default function DashboardPage() {
                         verticalAlign="bottom"
                         height={24}
                         iconType="circle"
-                        wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                        wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: 'inherit' }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -157,17 +155,16 @@ export default function DashboardPage() {
             </div>
 
             {/* Reports by Cluster */}
-            <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-gray-900/50">
+            <div className="flex min-h-72 flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-gray-900">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Reports by Cluster
+                  Reports by cluster
                 </h3>
-                <Activity className="text-gray-400" size={16} />
+                <Activity className="text-gray-400 dark:text-gray-500" size={16} />
               </div>
-
-              <div className="flex-1">
+              <div className="flex flex-1 items-center justify-center">
                 {clusterSummary.length ? (
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={200}>
                     <BarChart
                       data={clusterSummary}
                       margin={{ top: 10, right: 0, left: -24, bottom: 0 }}
@@ -193,11 +190,10 @@ export default function DashboardPage() {
                       <Tooltip
                         cursor={{ fill: 'rgba(156,163,175,0.05)' }}
                         contentStyle={{
-                          background: 'rgba(17, 24, 39, 0.95)',
+                          background: 'rgba(17,24,39,0.95)',
                           border: 'none',
                           borderRadius: '8px',
                           color: '#f9fafb',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                           fontSize: '12px',
                         }}
                       />
@@ -236,13 +232,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Recent Events Sidebar */}
+        {/* RIGHT COLUMN */}
         <div className="w-full xl:h-full xl:w-1/3">
-          <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-gray-900/50">
-            <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-white/10">
+          <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-gray-900">
+            <div className="mb-4 flex items-start justify-between border-b border-gray-100 pb-3 dark:border-white/10">
               <div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                  Recent Events
+                  Recent events
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Latest updates across the platform
@@ -250,7 +246,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Scrollable Container for events */}
             <div className="custom-scrollbar flex-1 space-y-2 overflow-y-auto pr-1">
               {events?.length ? (
                 events.map((event) => {
@@ -269,7 +264,7 @@ export default function DashboardPage() {
                       className="group flex flex-col gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3 transition-all hover:border-gray-200 hover:bg-white hover:shadow-sm dark:border-white/5 dark:bg-white/5 dark:hover:border-white/10 dark:hover:bg-white/10"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 overflow-hidden">
+                        <div className="min-w-0 flex-1">
                           <p className="group-hover:text-brand-600 dark:group-hover:text-brand-400 truncate text-sm font-medium text-gray-900 dark:text-white">
                             {event.name}
                           </p>
@@ -315,10 +310,6 @@ export default function DashboardPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Sub-Components                                                             */
-/* -------------------------------------------------------------------------- */
-
 function StatCard({
   title,
   value,
@@ -334,25 +325,25 @@ function StatCard({
 }) {
   const styles = {
     brand: {
-      bg: 'bg-brand-50/50 dark:bg-brand-500/10',
-      iconBg: 'bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400',
+      bg: 'bg-blue-50 dark:bg-blue-500/10',
+      iconBg: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
     },
     success: {
-      bg: 'bg-success-50/50 dark:bg-success-500/10',
-      iconBg: 'bg-success-100 text-success-600 dark:bg-success-500/20 dark:text-success-400',
+      bg: 'bg-green-50 dark:bg-green-500/10',
+      iconBg: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400',
     },
     warning: {
-      bg: 'bg-warning-50/50 dark:bg-warning-500/10',
-      iconBg: 'bg-warning-100 text-warning-600 dark:bg-warning-500/20 dark:text-warning-400',
+      bg: 'bg-amber-50 dark:bg-amber-500/10',
+      iconBg: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400',
     },
     error: {
-      bg: 'bg-error-50/50 dark:bg-error-500/10',
-      iconBg: 'bg-error-100 text-error-600 dark:bg-error-500/20 dark:text-error-400',
+      bg: 'bg-red-50 dark:bg-red-500/10',
+      iconBg: 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400',
     },
   };
 
   return (
-    <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-white/10 dark:bg-gray-900/50">
+    <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-white/10 dark:bg-gray-900">
       <div className="flex items-start justify-between">
         <div className="space-y-1.5">
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{title}</p>
@@ -370,16 +361,9 @@ function StatCard({
           {icon}
         </div>
       </div>
-
-      {trend && (
-        <div className="mt-3 flex items-center text-xs">
-          <span className="text-gray-500 dark:text-gray-400">{trend}</span>
-        </div>
-      )}
-
-      {/* Decorative gradient blur in background */}
+      {trend && <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">{trend}</div>}
       <div
-        className={`absolute -right-4 -bottom-4 h-24 w-24 rounded-full blur-2xl ${styles[color].bg} pointer-events-none`}
+        className={`pointer-events-none absolute -right-4 -bottom-4 h-24 w-24 rounded-full blur-2xl ${styles[color].bg}`}
       />
     </div>
   );
@@ -387,7 +371,7 @@ function StatCard({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 dark:border-white/10 dark:bg-white/5">
+    <div className="flex h-full min-h-40 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 dark:border-white/10 dark:bg-white/5">
       <Inbox className="mb-2 text-gray-300 dark:text-gray-600" size={24} />
       <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{message}</p>
     </div>
